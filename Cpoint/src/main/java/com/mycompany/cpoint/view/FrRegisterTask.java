@@ -3,6 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.mycompany.cpoint.view;
+import com.mycompany.cpoint.controller.TaskController;
+import com.mycompany.cpoint.exception.ValidationException;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -39,7 +43,7 @@ public class FrRegisterTask extends javax.swing.JFrame {
         rdbCompleted = new javax.swing.JRadioButton();
         btnSave = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
-        btnViewTask1 = new javax.swing.JButton();
+        btnViewTasks = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -110,10 +114,15 @@ public class FrRegisterTask extends javax.swing.JFrame {
         );
 
         btnSave.setText("Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
 
         btnCancel.setText("Cancel");
 
-        btnViewTask1.setText("View Tasks");
+        btnViewTasks.setText("View Tasks");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -125,7 +134,7 @@ public class FrRegisterTask extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblTitleTask, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnViewTask1)
+                        .addComponent(btnViewTasks)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnCancel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -143,23 +152,54 @@ public class FrRegisterTask extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSave)
                     .addComponent(btnCancel)
-                    .addComponent(btnViewTask1))
+                    .addComponent(btnViewTasks))
                 .addGap(11, 11, 11))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        String name = txtNameTask.getText();
+    String description = txtDescriptionTask.getText();
+    String state = getSelectedState();
+
+    TaskController controller = new TaskController();
+
+    try {
+        controller.registerTask(name, description, state);
+        JOptionPane.showMessageDialog(this, "Task cadastrada com sucesso!");
+    } catch (ValidationException ex) {
+        JOptionPane.showMessageDialog(this, ex.getMessage(),
+                "Erro de validação", JOptionPane.WARNING_MESSAGE);
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(this, "Erro ao salvar no banco: " + ex.getMessage(),
+                "Erro", JOptionPane.ERROR_MESSAGE);
+    }
+    }//GEN-LAST:event_btnSaveActionPerformed
+
     /**
      * @param args the command line arguments
      */
-
+    private String getSelectedState() {
+    if (rdbNotStarted.isSelected()) {
+        return rdbNotStarted.getText();
+    } else if (rdbInProgress.isSelected()) {
+        return rdbInProgress.getText();
+    } else if (rdbCompleted.isSelected()) {
+        return rdbCompleted.getText();
+    }
+    return null;
+}
+    public static void main(String[] args) {
+    java.awt.EventQueue.invokeLater(() -> new FrRegisterTask().setVisible(true));
+}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgState;
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnSave;
-    private javax.swing.JButton btnViewTask1;
+    private javax.swing.JButton btnViewTasks;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblDescriptionTask;
     private javax.swing.JLabel lblNameTask;

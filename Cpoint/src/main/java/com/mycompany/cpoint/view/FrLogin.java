@@ -32,8 +32,8 @@ public class FrLogin extends javax.swing.JFrame {
         lblEmail = new javax.swing.JLabel();
         txtPassword = new javax.swing.JPasswordField();
         lblPassword = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        chbRemenber = new javax.swing.JCheckBox();
+        btnSignIn = new javax.swing.JButton();
+        chbRemember = new javax.swing.JCheckBox();
         lblForgotPassword = new javax.swing.JLabel();
         lblIcon = new javax.swing.JLabel();
 
@@ -49,9 +49,9 @@ public class FrLogin extends javax.swing.JFrame {
 
         lblPassword.setText("Password:");
 
-        jButton1.setText("Sign in");
+        btnSignIn.setText("Sign in");
 
-        chbRemenber.setText("Remenber");
+        chbRemember.setText("Remember");
 
         lblForgotPassword.setBackground(new java.awt.Color(153, 153, 153));
         lblForgotPassword.setForeground(new java.awt.Color(102, 102, 102));
@@ -71,12 +71,12 @@ public class FrLogin extends javax.swing.JFrame {
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnSignIn, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(14, 14, 14))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(chbRemenber)
+                                .addComponent(chbRemember)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(lblForgotPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -99,10 +99,10 @@ public class FrLogin extends javax.swing.JFrame {
                 .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chbRemenber)
+                    .addComponent(chbRemember)
                     .addComponent(lblForgotPassword))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnSignIn, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(15, 15, 15))
         );
 
@@ -145,8 +145,8 @@ public class FrLogin extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox chbRemenber;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnSignIn;
+    private javax.swing.JCheckBox chbRemember;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblEmail;
     private javax.swing.JLabel lblForgotPassword;

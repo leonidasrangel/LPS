@@ -93,6 +93,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Save"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSaveActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnCancel">
       <Properties>
@@ -276,14 +279,13 @@
         <Component class="javax.swing.JComboBox" name="cmbDepartament">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="7">
+              <StringArray count="6">
                 <StringItem index="0" value="Administration"/>
                 <StringItem index="1" value="Accounting"/>
                 <StringItem index="2" value="Finance"/>
                 <StringItem index="3" value="Human Resources"/>
                 <StringItem index="4" value="Information Technology"/>
                 <StringItem index="5" value="Procurement"/>
-                <StringItem index="6" value=" "/>
               </StringArray>
             </Property>
           </Properties>

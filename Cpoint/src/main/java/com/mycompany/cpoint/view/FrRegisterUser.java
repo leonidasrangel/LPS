@@ -3,6 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.mycompany.cpoint.view;
+import com.mycompany.cpoint.controller.UserController;
+import com.mycompany.cpoint.exception.ValidationException;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -60,6 +64,11 @@ public class FrRegisterUser extends javax.swing.JFrame {
         lblTitle.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         btnSave.setText("Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
 
         btnCancel.setText("Cancel");
 
@@ -88,7 +97,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
         bgGender.add(rdbNotDisclose);
         rdbNotDisclose.setText("Not disclose");
 
-        cmbDepartament.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Administration", "Accounting", "Finance", "Human Resources", "Information Technology", "Procurement", " " }));
+        cmbDepartament.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Administration", "Accounting", "Finance", "Human Resources", "Information Technology", "Procurement" }));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -212,9 +221,45 @@ public class FrRegisterUser extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+       
+    String firstName = txtFirstName.getText();
+    String lastName = txtLastName.getText();
+    String email = txtEmail.getText();
+    String username = txtUsername.getText();
+    String password = new String(txtPassword.getPassword());
+    String confirmPassword = new String(txtConfirmPassword.getPassword());
+    String department = (String) cmbDepartament.getSelectedItem();
+    String gender = getSelectedGender();
+
+    UserController controller = new UserController();
+
+    try {
+        controller.registerUser(firstName, lastName, email, username, password,
+                confirmPassword, department, gender);
+        JOptionPane.showMessageDialog(this, "Usuário cadastrado com sucesso!");
+    } catch (ValidationException ex) {
+        JOptionPane.showMessageDialog(this, ex.getMessage(),
+                "Erro de validação", JOptionPane.WARNING_MESSAGE);
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(this, "Erro ao salvar no banco: " + ex.getMessage(),
+                "Erro", JOptionPane.ERROR_MESSAGE);
+    }
+    }//GEN-LAST:event_btnSaveActionPerformed
+    
+    private String getSelectedGender() {
+    if (rdbMan.isSelected()) {
+        return rdbMan.getText();
+    } else if (rdbWoman.isSelected()) {
+        return rdbWoman.getText();
+    } else if (rdbNotDisclose.isSelected()) {
+        return rdbNotDisclose.getText();
+    }
+    return null;
+}
+    public static void main(String[] args) {
+    java.awt.EventQueue.invokeLater(() -> new FrRegisterUser().setVisible(true));
+}
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

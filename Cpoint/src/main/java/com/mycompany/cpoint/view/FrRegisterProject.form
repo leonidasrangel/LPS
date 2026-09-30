@@ -27,7 +27,7 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="lblTitleProject" pref="405" max="32767" attributes="0"/>
+                  <Component id="lblTitleProject" pref="487" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="btnViewProjects" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
@@ -82,6 +82,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Save"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSaveActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnViewProjects">
       <Properties>
@@ -100,7 +103,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="lblNameProject" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="txtNameProject" pref="312" max="32767" attributes="0"/>
+                          <Component id="txtNameProject" pref="394" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
                           <Component id="lblDescriptionProject" min="-2" max="-2" attributes="0"/>
@@ -108,12 +111,12 @@
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="lblStartDate" max="32767" attributes="0"/>
-                          <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtStartDate" max="32767" attributes="0"/>
-                          <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="txtStartDate" min="-2" pref="129" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="lblEndDate" max="32767" attributes="0"/>
                           <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
-                          <Component id="txtEndDate" pref="100" max="32767" attributes="0"/>
+                          <Component id="txtEndDate" pref="141" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace min="-2" max="-2" attributes="0"/>

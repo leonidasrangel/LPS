@@ -52,7 +52,7 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         btnRegisterProject = new javax.swing.JButton();
         btnRegisterTeam = new javax.swing.JButton();
         btnViewProjects = new javax.swing.JButton();
-        btnViewTask1 = new javax.swing.JButton();
+        btnViewTasks = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -268,7 +268,7 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
 
         btnViewProjects.setText("View Projects");
 
-        btnViewTask1.setText("View Tasks");
+        btnViewTasks.setText("View Tasks");
 
         javax.swing.GroupLayout pnlPanelCrudLayout = new javax.swing.GroupLayout(pnlPanelCrud);
         pnlPanelCrud.setLayout(pnlPanelCrudLayout);
@@ -287,7 +287,7 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
                             .addComponent(btnDashboard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnViewProjects, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(btnViewTask1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnViewTasks, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         pnlPanelCrudLayout.setVerticalGroup(
@@ -306,7 +306,7 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(btnRegisterTeam)
                 .addGap(18, 18, 18)
-                .addComponent(btnViewTask1)
+                .addComponent(btnViewTasks)
                 .addGap(18, 18, 18)
                 .addComponent(btnViewProjects)
                 .addContainerGap(98, Short.MAX_VALUE))
@@ -395,7 +395,7 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
     private javax.swing.JButton btnRegisterTeam;
     private javax.swing.JButton btnRegisterUser;
     private javax.swing.JButton btnViewProjects;
-    private javax.swing.JButton btnViewTask1;
+    private javax.swing.JButton btnViewTasks;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lblIcon;
     private javax.swing.JLabel lblIconProjects;

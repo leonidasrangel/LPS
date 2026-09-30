@@ -3,19 +3,41 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.mycompany.cpoint.view;
+import com.mycompany.cpoint.dao.UserDAO;
+import com.mycompany.cpoint.model.User;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+import com.mycompany.cpoint.controller.TeamController;
+import com.mycompany.cpoint.exception.ValidationException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Rangel
  */
 public class FrRegisterTeam extends javax.swing.JFrame {
+    private final List<User> selectedMembers = new ArrayList<>();
 
     /**
      * Creates new form FrRegisterTeam
      */
     public FrRegisterTeam() {
-        initComponents();
+    initComponents();
+    loadUsers();
+}
+
+private void loadUsers() {
+    try {
+        UserDAO userDAO = new UserDAO();
+        for (User user : userDAO.findAll()) {
+            cmbUsers.addItem(user);
+        }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Erro ao carregar usuários: " + e.getMessage(),
+                "Erro", JOptionPane.ERROR_MESSAGE);
     }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -32,9 +54,10 @@ public class FrRegisterTeam extends javax.swing.JFrame {
         lblNameTeam = new javax.swing.JLabel();
         txtNameTeam = new javax.swing.JTextField();
         btnAddMember = new javax.swing.JButton();
-        btnEditMember = new javax.swing.JButton();
         btnDeleteMember = new javax.swing.JButton();
-        btnViewMember = new javax.swing.JButton();
+        btnListMembers = new javax.swing.JButton();
+        cmbUsers = new javax.swing.JComboBox<>();
+        lblSelectMember = new javax.swing.JLabel();
         btnCancel = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
 
@@ -51,12 +74,27 @@ public class FrRegisterTeam extends javax.swing.JFrame {
         lblNameTeam.setText("Name team:");
 
         btnAddMember.setText("Add member");
-
-        btnEditMember.setText("Edit member");
+        btnAddMember.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddMemberActionPerformed(evt);
+            }
+        });
 
         btnDeleteMember.setText("Delete member");
+        btnDeleteMember.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteMemberActionPerformed(evt);
+            }
+        });
 
-        btnViewMember.setText("View member");
+        btnListMembers.setText("List Members");
+        btnListMembers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnListMembersActionPerformed(evt);
+            }
+        });
+
+        lblSelectMember.setText("Select Member:");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -66,17 +104,21 @@ public class FrRegisterTeam extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(lblNameTeam)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtNameTeam))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(57, 57, 57)
                         .addComponent(btnAddMember, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnEditMember, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
                         .addComponent(btnDeleteMember, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
-                        .addComponent(btnViewMember, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(btnListMembers, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(61, 61, 61))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblNameTeam)
+                            .addComponent(lblSelectMember))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cmbUsers, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtNameTeam))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -88,16 +130,24 @@ public class FrRegisterTeam extends javax.swing.JFrame {
                     .addComponent(txtNameTeam, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cmbUsers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblSelectMember))
+                .addGap(24, 24, 24)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddMember)
-                    .addComponent(btnEditMember)
                     .addComponent(btnDeleteMember)
-                    .addComponent(btnViewMember))
-                .addContainerGap(125, Short.MAX_VALUE))
+                    .addComponent(btnListMembers))
+                .addContainerGap(79, Short.MAX_VALUE))
         );
 
         btnCancel.setText("Cancel");
 
         btnSave.setText("Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -137,21 +187,92 @@ public class FrRegisterTeam extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnAddMemberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddMemberActionPerformed
+        User selected = (User) cmbUsers.getSelectedItem();
+
+    if (selected == null) {
+        JOptionPane.showMessageDialog(this, "Selecione um usuário primeiro.",
+                "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    if (selectedMembers.contains(selected)) {
+        JOptionPane.showMessageDialog(this, "Esse usuário já foi adicionado ao time.",
+                "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    selectedMembers.add(selected);
+    JOptionPane.showMessageDialog(this, selected + " adicionado ao time.");
+    }//GEN-LAST:event_btnAddMemberActionPerformed
+
+    private void btnDeleteMemberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteMemberActionPerformed
+        User selected = (User) cmbUsers.getSelectedItem();
+
+    if (selected == null) {
+        JOptionPane.showMessageDialog(this, "Selecione um usuário primeiro.",
+                "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    if (selectedMembers.remove(selected)) {
+        JOptionPane.showMessageDialog(this, selected + " removido do time.");
+    } else {
+        JOptionPane.showMessageDialog(this, "Esse usuário não está no time.",
+                "Aviso", JOptionPane.WARNING_MESSAGE);
+    }
+    }//GEN-LAST:event_btnDeleteMemberActionPerformed
+
+    private void btnListMembersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListMembersActionPerformed
+        if (selectedMembers.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Nenhum membro adicionado ainda.");
+        return;
+    }
+
+    StringBuilder sb = new StringBuilder("Membros do time:\n");
+    for (User member : selectedMembers) {
+        sb.append("- ").append(member).append("\n");
+    }
+    JOptionPane.showMessageDialog(this, sb.toString());
+    }//GEN-LAST:event_btnListMembersActionPerformed
+
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+    String name = txtNameTeam.getText();
+    TeamController controller = new TeamController();
+
+    try {
+        controller.registerTeam(name, selectedMembers);
+        JOptionPane.showMessageDialog(this, "Time cadastrado com sucesso!");
+        selectedMembers.clear();
+        txtNameTeam.setText("");
+    } catch (ValidationException ex) {
+        JOptionPane.showMessageDialog(this, ex.getMessage(),
+                "Erro de validação", JOptionPane.WARNING_MESSAGE);
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(this, "Erro ao salvar no banco: " + ex.getMessage(),
+                "Erro", JOptionPane.ERROR_MESSAGE);
+    }
+    }//GEN-LAST:event_btnSaveActionPerformed
+
     /**
      * @param args the command line arguments
      */
+    public static void main(String[] args) {
+    java.awt.EventQueue.invokeLater(() -> new FrRegisterTeam().setVisible(true));
+}
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddMember;
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnDeleteMember;
-    private javax.swing.JButton btnEditMember;
+    private javax.swing.JButton btnListMembers;
     private javax.swing.JButton btnSave;
-    private javax.swing.JButton btnViewMember;
+    private javax.swing.JComboBox<User> cmbUsers;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblIcon;
     private javax.swing.JLabel lblNameTeam;
+    private javax.swing.JLabel lblSelectMember;
     private javax.swing.JLabel lblTitleTeam;
     private javax.swing.JTextField txtNameTeam;
     // End of variables declaration//GEN-END:variables

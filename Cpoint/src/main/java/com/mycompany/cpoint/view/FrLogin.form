@@ -88,13 +88,13 @@
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          <Component id="jButton1" min="-2" pref="99" max="-2" attributes="0"/>
+                          <Component id="btnSignIn" min="-2" pref="99" max="-2" attributes="0"/>
                           <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
-                                  <Component id="chbRemenber" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chbRemember" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="32767" attributes="0"/>
                                   <Component id="lblForgotPassword" min="-2" pref="94" max="-2" attributes="0"/>
                               </Group>
@@ -125,11 +125,11 @@
                   <Component id="txtPassword" min="-2" pref="45" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="chbRemenber" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="chbRemember" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="lblForgotPassword" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="45" max="32767" attributes="0"/>
-                  <Component id="jButton1" min="-2" pref="34" max="-2" attributes="0"/>
+                  <Component id="btnSignIn" min="-2" pref="34" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -150,14 +150,14 @@
             <Property name="text" type="java.lang.String" value="Password:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JButton" name="jButton1">
+        <Component class="javax.swing.JButton" name="btnSignIn">
           <Properties>
             <Property name="text" type="java.lang.String" value="Sign in"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JCheckBox" name="chbRemenber">
+        <Component class="javax.swing.JCheckBox" name="chbRemember">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Remenber"/>
+            <Property name="text" type="java.lang.String" value="Remember"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="lblForgotPassword">
