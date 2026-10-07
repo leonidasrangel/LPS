@@ -8,7 +8,6 @@ package com.mycompany.cpoint.model;
  *
  * @author Rangel
  */
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,5 +48,10 @@ public class Team {
 
     public void removeMember(User user) {
         members.remove(user);
+    }
+
+    @Override
+    public String toString() {
+        return "Team{id=" + id + ", name=" + name + ", members=" + members + "}";
     }
 }

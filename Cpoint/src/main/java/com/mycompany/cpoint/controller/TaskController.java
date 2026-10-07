@@ -12,38 +12,31 @@ package com.mycompany.cpoint.controller;
 import com.mycompany.cpoint.dao.TaskDAO;
 import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.Task;
+import com.mycompany.cpoint.validation.TaskValidator;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TaskController {
 
     private final TaskDAO taskDAO = new TaskDAO();
+    private final TaskValidator taskValidator = new TaskValidator();
 
-    public void registerTask(String name, String description, String state)
-            throws ValidationException, SQLException {
+    public void saveTask(Task task) throws ValidationException, SQLException {
+        taskValidator.validate(task);
 
-        List<String> errors = new ArrayList<>();
-
-        if (isBlank(name)) {
-            errors.add("Informe o nome da task.");
+        if (task.getId() == 0) {
+            taskDAO.insert(task);
+        } else {
+            taskDAO.update(task);
         }
-        if (isBlank(description)) {
-            errors.add("Informe a descrição.");
-        }
-        if (isBlank(state)) {
-            errors.add("Selecione o estado da task.");
-        }
-
-        if (!errors.isEmpty()) {
-            throw new ValidationException(errors);
-        }
-
-        Task task = new Task(name, description, state);
-        taskDAO.insert(task);
     }
 
-    private boolean isBlank(String text) {
-        return text == null || text.trim().isEmpty();
+    public void deleteTask(int id) throws ValidationException, SQLException {
+        taskValidator.validateId(id);
+        taskDAO.delete(id);
+    }
+
+    public List<Task> listTasks() throws SQLException {
+        return taskDAO.findAll();
     }
 }

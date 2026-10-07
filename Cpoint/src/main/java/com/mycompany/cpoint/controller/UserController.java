@@ -11,63 +11,55 @@ package com.mycompany.cpoint.controller;
 import com.mycompany.cpoint.dao.UserDAO;
 import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.User;
+import com.mycompany.cpoint.validation.UserValidator;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class UserController {
 
-    private static final Pattern EMAIL_PATTERN =
-        Pattern.compile("^[\\w.+-]+@[\\w-]+\\.[a-zA-Z]{2,}$");
-    private static final int MIN_PASSWORD_LENGTH = 6;
-
     private final UserDAO userDAO = new UserDAO();
+    private final UserValidator userValidator = new UserValidator();
 
-    public void registerUser(String firstName, String lastName, String email, String username,
-                              String password, String confirmPassword, String department,
-                              String gender) throws ValidationException, SQLException {
+    public void saveUser(User user) throws ValidationException, SQLException {
+        userValidator.validate(user);
+        checkUniqueness(user);
 
+        if (user.getId() == 0) {
+            userDAO.insert(user);
+        } else {
+            userDAO.update(user);
+        }
+    }
+
+    public void deleteUser(int id) throws ValidationException, SQLException {
+        userValidator.validateId(id);
+
+        if (userDAO.isTeamMember(id)) {
+            throw new ValidationException(List.of(
+                "This user is a member of a team and cannot be deleted. "
+                + "Remove them from the team first."));
+        }
+
+        userDAO.delete(id);
+    }
+
+    public List<User> listUsers() throws SQLException {
+        return userDAO.findAll();
+    }
+
+    private void checkUniqueness(User user) throws ValidationException, SQLException {
         List<String> errors = new ArrayList<>();
 
-        if (isBlank(firstName)) {
-            errors.add("Informe o primeiro nome.");
+        if (userDAO.existsByEmail(user.getEmail(), user.getId())) {
+            errors.add("This email is already in use.");
         }
-        if (isBlank(lastName)) {
-            errors.add("Informe o sobrenome.");
-        }
-        if (isBlank(email)) {
-            errors.add("Informe o email.");
-        } else if (!EMAIL_PATTERN.matcher(email).matches()) {
-            errors.add("O email informado não é válido.");
-        }
-        if (isBlank(username)) {
-            errors.add("Informe o username.");
-        }
-        if (isBlank(password)) {
-            errors.add("Informe a senha.");
-        } else if (password.length() < MIN_PASSWORD_LENGTH) {
-            errors.add("A senha deve ter pelo menos " + MIN_PASSWORD_LENGTH + " caracteres.");
-        }
-        if (!password.equals(confirmPassword)) {
-            errors.add("As senhas não coincidem.");
-        }
-        if (isBlank(department)) {
-            errors.add("Selecione o departamento.");
-        }
-        if (isBlank(gender)) {
-            errors.add("Selecione o gênero.");
+        if (userDAO.existsByUsername(user.getUsername(), user.getId())) {
+            errors.add("This username is already in use.");
         }
 
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
-
-        User user = new User(firstName, lastName, email, username, password, department, gender);
-        userDAO.insert(user);
-    }
-
-    private boolean isBlank(String text) {
-        return text == null || text.trim().isEmpty();
     }
 }

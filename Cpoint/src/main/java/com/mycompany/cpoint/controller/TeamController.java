@@ -8,43 +8,34 @@ package com.mycompany.cpoint.controller;
  *
  * @author Rangel
  */
-
 import com.mycompany.cpoint.dao.TeamDAO;
 import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.Team;
-import com.mycompany.cpoint.model.User;
+import com.mycompany.cpoint.validation.TeamValidator;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TeamController {
 
     private final TeamDAO teamDAO = new TeamDAO();
+    private final TeamValidator teamValidator = new TeamValidator();
 
-    public void registerTeam(String name, List<User> members) throws ValidationException, SQLException {
+    public void saveTeam(Team team) throws ValidationException, SQLException {
+        teamValidator.validate(team);
 
-        List<String> errors = new ArrayList<>();
-
-        if (isBlank(name)) {
-            errors.add("Informe o nome do time.");
+        if (team.getId() == 0) {
+            teamDAO.insert(team);
+        } else {
+            teamDAO.update(team);
         }
-        if (members.isEmpty()) {
-            errors.add("Adicione pelo menos um membro ao time.");
-        }
-
-        if (!errors.isEmpty()) {
-            throw new ValidationException(errors);
-        }
-
-        Team team = new Team(name);
-        for (User member : members) {
-            team.addMember(member);
-        }
-
-        teamDAO.insert(team);
     }
 
-    private boolean isBlank(String text) {
-        return text == null || text.trim().isEmpty();
+    public void deleteTeam(int id) throws ValidationException, SQLException {
+        teamValidator.validateId(id);
+        teamDAO.delete(id);
+    }
+
+    public List<Team> listTeams() throws SQLException {
+        return teamDAO.findAll();
     }
 }

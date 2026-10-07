@@ -3,10 +3,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.mycompany.cpoint.view;
+
 import com.mycompany.cpoint.controller.TaskController;
 import com.mycompany.cpoint.exception.ValidationException;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
+import com.mycompany.cpoint.model.Task;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -14,11 +20,100 @@ import javax.swing.JOptionPane;
  */
 public class FrRegisterTask extends javax.swing.JFrame {
 
+    private Task editingTask;
+
+    private final TaskController taskController = new TaskController();
+    private List<Task> tasks = new ArrayList<>();
+
     /**
      * Creates new form FrRegisterTask
      */
     public FrRegisterTask() {
         initComponents();
+        tblTasks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        refreshTable();
+        clearFields();
+        enableFields(false);
+    }
+
+    private void refreshTable() {
+        DefaultTableModel model = (DefaultTableModel) tblTasks.getModel();
+        model.setRowCount(0);
+
+        try {
+            tasks = taskController.listTasks();
+        } catch (SQLException ex) {
+            tasks = new ArrayList<>();
+            JOptionPane.showMessageDialog(this, "Error loading tasks: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        for (Task task : tasks) {
+            model.addRow(new Object[]{
+                task.getId(),
+                task.getName(),
+                task.getDescription(),
+                task.getState()
+            });
+        }
+    }
+
+    private Task getSelectedObjectFromGrid() {
+        int row = tblTasks.getSelectedRow();
+        if (row < 0) {
+            return null;
+        }
+        return tasks.get(tblTasks.convertRowIndexToModel(row));
+    }
+
+    private void clearFields() {
+        txtNameTask.setText("");
+        txtDescriptionTask.setText("");
+        bgState.clearSelection();
+    }
+
+    private void enableFields(boolean enabled) {
+        txtNameTask.setEnabled(enabled);
+        txtDescriptionTask.setEnabled(enabled);
+        rdbNotStarted.setEnabled(enabled);
+        rdbInProgress.setEnabled(enabled);
+        rdbCompleted.setEnabled(enabled);
+
+        btnSave.setEnabled(enabled);
+        btnCancel.setEnabled(enabled);
+
+        btnNew.setEnabled(!enabled);
+        btnEdit.setEnabled(!enabled);
+        btnDelete.setEnabled(!enabled);
+        tblTasks.setEnabled(!enabled);
+    }
+
+    private void objectToFields(Task task) {
+        txtNameTask.setText(task.getName());
+        txtDescriptionTask.setText(task.getDescription());
+
+        String state = task.getState();
+        if (rdbNotStarted.getText().equals(state)) {
+            rdbNotStarted.setSelected(true);
+        } else if (rdbInProgress.getText().equals(state)) {
+            rdbInProgress.setSelected(true);
+        } else if (rdbCompleted.getText().equals(state)) {
+            rdbCompleted.setSelected(true);
+        } else {
+            bgState.clearSelection();
+        }
+    }
+
+    private Task fieldsToObject() {
+        String name = txtNameTask.getText();
+        String description = txtDescriptionTask.getText();
+        String state = getSelectedState();
+
+        if (editingTask == null) {
+            return new Task(name, description, state);
+        }
+        return new Task(editingTask.getId(), name, description, state);
     }
 
     /**
@@ -43,7 +138,11 @@ public class FrRegisterTask extends javax.swing.JFrame {
         rdbCompleted = new javax.swing.JRadioButton();
         btnSave = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
-        btnViewTasks = new javax.swing.JButton();
+        scrTasks = new javax.swing.JScrollPane();
+        tblTasks = new javax.swing.JTable();
+        btnNew = new javax.swing.JButton();
+        btnEdit = new javax.swing.JButton();
+        btnDelete = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -67,6 +166,71 @@ public class FrRegisterTask extends javax.swing.JFrame {
         bgState.add(rdbCompleted);
         rdbCompleted.setText("Completed");
 
+        btnSave.setText("Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
+
+        btnCancel.setText("Cancel");
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
+
+        tblTasks.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Name", "Description", "State"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblTasks.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblTasksMouseClicked(evt);
+            }
+        });
+        scrTasks.setViewportView(tblTasks);
+
+        btnNew.setText("New");
+        btnNew.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNewActionPerformed(evt);
+            }
+        });
+
+        btnEdit.setText("Edit");
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditActionPerformed(evt);
+            }
+        });
+
+        btnDelete.setText("Delete");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -79,9 +243,13 @@ public class FrRegisterTask extends javax.swing.JFrame {
                         .addComponent(lblNameTask)
                         .addGap(18, 18, 18)
                         .addComponent(txtNameTask))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblDescriptionTask)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(btnCancel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnSave))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(lblState)
                                 .addGap(18, 18, 18)
@@ -89,8 +257,18 @@ public class FrRegisterTask extends javax.swing.JFrame {
                                 .addGap(18, 18, 18)
                                 .addComponent(rdbInProgress)
                                 .addGap(18, 18, 18)
-                                .addComponent(rdbCompleted)))
-                        .addGap(0, 75, Short.MAX_VALUE)))
+                                .addComponent(rdbCompleted))))
+                    .addComponent(scrTasks, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblDescriptionTask)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(btnNew)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnEdit)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnDelete)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -103,26 +281,26 @@ public class FrRegisterTask extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(lblDescriptionTask)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtDescriptionTask, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtDescriptionTask, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblState)
                     .addComponent(rdbNotStarted)
                     .addComponent(rdbInProgress)
                     .addComponent(rdbCompleted))
-                .addContainerGap(45, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSave)
+                    .addComponent(btnCancel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnNew)
+                    .addComponent(btnEdit)
+                    .addComponent(btnDelete))
+                .addGap(18, 18, 18)
+                .addComponent(scrTasks, javax.swing.GroupLayout.PREFERRED_SIZE, 338, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(17, 17, 17))
         );
-
-        btnSave.setText("Save");
-        btnSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveActionPerformed(evt);
-            }
-        });
-
-        btnCancel.setText("Cancel");
-
-        btnViewTasks.setText("View Tasks");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -131,14 +309,7 @@ public class FrRegisterTask extends javax.swing.JFrame {
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblTitleTask, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnViewTasks)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnCancel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnSave)))
+                .addComponent(lblTitleTask, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -146,60 +317,126 @@ public class FrRegisterTask extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lblTitleTask, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSave)
-                    .addComponent(btnCancel)
-                    .addComponent(btnViewTasks))
-                .addGap(11, 11, 11))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        String name = txtNameTask.getText();
-    String description = txtDescriptionTask.getText();
-    String state = getSelectedState();
+        Task task = fieldsToObject();
+        boolean isNew = task.getId() == 0;
 
-    TaskController controller = new TaskController();
+        try {
+            taskController.saveTask(task);
 
-    try {
-        controller.registerTask(name, description, state);
-        JOptionPane.showMessageDialog(this, "Task cadastrada com sucesso!");
-    } catch (ValidationException ex) {
-        JOptionPane.showMessageDialog(this, ex.getMessage(),
-                "Erro de validação", JOptionPane.WARNING_MESSAGE);
-    } catch (SQLException ex) {
-        JOptionPane.showMessageDialog(this, "Erro ao salvar no banco: " + ex.getMessage(),
-                "Erro", JOptionPane.ERROR_MESSAGE);
-    }
+            editingTask = null;
+            refreshTable();
+            clearFields();
+            enableFields(false);
+            JOptionPane.showMessageDialog(this,
+                    isNew ? "Task registered successfully." : "Task updated successfully.");
+        } catch (ValidationException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Validation error", JOptionPane.WARNING_MESSAGE);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void tblTasksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblTasksMouseClicked
+        if (!tblTasks.isEnabled()) {
+            return;
+        }
+        Task task = getSelectedObjectFromGrid();
+        if (task != null) {
+            objectToFields(task);
+        }
+    }//GEN-LAST:event_tblTasksMouseClicked
+
+    private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
+        editingTask = null;
+        tblTasks.clearSelection();
+        clearFields();
+        enableFields(true);
+        txtNameTask.requestFocus();
+    }//GEN-LAST:event_btnNewActionPerformed
+
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
+        Task task = getSelectedObjectFromGrid();
+        if (task == null) {
+            JOptionPane.showMessageDialog(this, "Select a task in the table first.",
+                    "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        editingTask = task;
+        objectToFields(task);
+        enableFields(true);
+        txtNameTask.requestFocus();
+    }//GEN-LAST:event_btnEditActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        Task task = getSelectedObjectFromGrid();
+        if (task == null) {
+            JOptionPane.showMessageDialog(this, "Select a task in the table first.",
+                    "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int option = JOptionPane.showConfirmDialog(this,
+                "Delete the task \"" + task.getName() + "\"?",
+                "Confirm deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (option != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        try {
+            taskController.deleteTask(task.getId());
+            refreshTable();
+            clearFields();
+            JOptionPane.showMessageDialog(this, "Task deleted successfully.");
+        } catch (ValidationException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Validation error", JOptionPane.WARNING_MESSAGE);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        editingTask = null;
+        clearFields();
+        enableFields(false);
+    }//GEN-LAST:event_btnCancelActionPerformed
 
     /**
      * @param args the command line arguments
      */
     private String getSelectedState() {
-    if (rdbNotStarted.isSelected()) {
-        return rdbNotStarted.getText();
-    } else if (rdbInProgress.isSelected()) {
-        return rdbInProgress.getText();
-    } else if (rdbCompleted.isSelected()) {
-        return rdbCompleted.getText();
+        if (rdbNotStarted.isSelected()) {
+            return rdbNotStarted.getText();
+        } else if (rdbInProgress.isSelected()) {
+            return rdbInProgress.getText();
+        } else if (rdbCompleted.isSelected()) {
+            return rdbCompleted.getText();
+        }
+        return null;
     }
-    return null;
-}
+
     public static void main(String[] args) {
-    java.awt.EventQueue.invokeLater(() -> new FrRegisterTask().setVisible(true));
-}
+        java.awt.EventQueue.invokeLater(() -> new FrRegisterTask().setVisible(true));
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgState;
     private javax.swing.JButton btnCancel;
+    private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnEdit;
+    private javax.swing.JButton btnNew;
     private javax.swing.JButton btnSave;
-    private javax.swing.JButton btnViewTasks;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblDescriptionTask;
     private javax.swing.JLabel lblNameTask;
@@ -208,6 +445,8 @@ public class FrRegisterTask extends javax.swing.JFrame {
     private javax.swing.JRadioButton rdbCompleted;
     private javax.swing.JRadioButton rdbInProgress;
     private javax.swing.JRadioButton rdbNotStarted;
+    private javax.swing.JScrollPane scrTasks;
+    private javax.swing.JTable tblTasks;
     private javax.swing.JTextField txtDescriptionTask;
     private javax.swing.JTextField txtNameTask;
     // End of variables declaration//GEN-END:variables

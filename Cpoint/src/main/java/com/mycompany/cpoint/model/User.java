@@ -21,7 +21,7 @@ public class User {
 
     // Construtor para um usuário NOVO (ainda não salvo no banco, sem id)
     public User(String firstName, String lastName, String email, String username,
-                String password, String department, String gender) {
+            String password, String department, String gender) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -33,7 +33,7 @@ public class User {
 
     // Construtor para um usuário JÁ EXISTENTE (vindo do banco, já tem id)
     public User(int id, String firstName, String lastName, String email, String username,
-                String password, String department, String gender) {
+            String password, String department, String gender) {
         this(firstName, lastName, email, username, password, department, gender);
         this.id = id;
     }
@@ -101,5 +101,22 @@ public class User {
     @Override
     public String toString() {
         return firstName + " " + lastName + " (" + username + ")";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof User)) {
+            return false;
+        }
+        User other = (User) obj;
+        return id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
     }
 }
