@@ -12,7 +12,7 @@ import com.mycompany.cpoint.dao.TeamDAO;
 import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.Team;
 import com.mycompany.cpoint.validation.TeamValidator;
-import java.sql.SQLException;
+import com.mycompany.cpoint.exception.DatabaseException;
 import java.util.List;
 
 public class TeamController {
@@ -20,7 +20,7 @@ public class TeamController {
     private final TeamDAO teamDAO = new TeamDAO();
     private final TeamValidator teamValidator = new TeamValidator();
 
-    public void saveTeam(Team team) throws ValidationException, SQLException {
+    public void saveTeam(Team team) throws ValidationException, DatabaseException {
         teamValidator.validate(team);
 
         if (team.getId() == 0) {
@@ -30,12 +30,12 @@ public class TeamController {
         }
     }
 
-    public void deleteTeam(int id) throws ValidationException, SQLException {
+    public void deleteTeam(int id) throws ValidationException, DatabaseException {
         teamValidator.validateId(id);
         teamDAO.delete(id);
     }
 
-    public List<Team> listTeams() throws SQLException {
+    public List<Team> listTeams() throws DatabaseException {
         return teamDAO.findAll();
     }
 }

@@ -12,7 +12,7 @@ import com.mycompany.cpoint.dao.ProjectDAO;
 import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.Project;
 import com.mycompany.cpoint.validation.ProjectValidator;
-import java.sql.SQLException;
+import com.mycompany.cpoint.exception.DatabaseException;
 import java.util.List;
 
 public class ProjectController {
@@ -20,7 +20,7 @@ public class ProjectController {
     private final ProjectDAO projectDAO = new ProjectDAO();
     private final ProjectValidator projectValidator = new ProjectValidator();
 
-    public void saveProject(Project project) throws ValidationException, SQLException {
+    public void saveProject(Project project) throws ValidationException, DatabaseException {
         projectValidator.validate(project);
 
         if (project.getId() == 0) {
@@ -30,12 +30,12 @@ public class ProjectController {
         }
     }
 
-    public void deleteProject(int id) throws ValidationException, SQLException {
+    public void deleteProject(int id) throws ValidationException, DatabaseException {
         projectValidator.validateId(id);
         projectDAO.delete(id);
     }
 
-    public List<Project> listProjects() throws SQLException {
+    public List<Project> listProjects() throws DatabaseException {
         return projectDAO.findAll();
     }
 }

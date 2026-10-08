@@ -8,16 +8,37 @@ package com.mycompany.cpoint.model;
  *
  * @author Rangel
  */
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "projects")
 public class Project {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String description;
+
+    @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
-    private LocalDate endDate; // pode ser null — campo opcional
+
+    @Column(name = "end_date")
+    private LocalDate endDate; // may be null: optional field
+
+    protected Project() {
+        // Required by JPA
+    }
 
     public Project(String name, String description, LocalDate startDate, LocalDate endDate) {
         this.name = name;

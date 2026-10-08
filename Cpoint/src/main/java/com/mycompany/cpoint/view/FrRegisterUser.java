@@ -7,7 +7,7 @@ package com.mycompany.cpoint.view;
 import com.mycompany.cpoint.controller.UserController;
 import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.User;
-import java.sql.SQLException;
+import com.mycompany.cpoint.exception.DatabaseException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -41,7 +41,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
 
         try {
             users = userController.listUsers();
-        } catch (SQLException ex) {
+        } catch (DatabaseException ex) {
             users = new ArrayList<>();
             JOptionPane.showMessageDialog(this, "Error loading users: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -434,7 +434,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
         } catch (ValidationException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Validation error", JOptionPane.WARNING_MESSAGE);
-        } catch (SQLException ex) {
+        } catch (DatabaseException ex) {
             JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -495,7 +495,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
         } catch (ValidationException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Validation error", JOptionPane.WARNING_MESSAGE);
-        } catch (SQLException ex) {
+        } catch (DatabaseException ex) {
             JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }

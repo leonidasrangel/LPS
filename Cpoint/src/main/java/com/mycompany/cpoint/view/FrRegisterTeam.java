@@ -3,13 +3,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.mycompany.cpoint.view;
+
 import com.mycompany.cpoint.controller.TeamController;
 import com.mycompany.cpoint.controller.UserController;
+import com.mycompany.cpoint.exception.DatabaseException;
 import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.Team;
 import com.mycompany.cpoint.model.User;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.StringJoiner;
 import javax.swing.JOptionPane;
@@ -46,7 +48,7 @@ public class FrRegisterTeam extends javax.swing.JFrame {
             for (User user : userController.listUsers()) {
                 cmbUsers.addItem(user);
             }
-        } catch (SQLException ex) {
+        } catch (DatabaseException ex) {
             JOptionPane.showMessageDialog(this, "Error loading users: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -58,7 +60,7 @@ public class FrRegisterTeam extends javax.swing.JFrame {
 
         try {
             teams = teamController.listTeams();
-        } catch (SQLException ex) {
+        } catch (DatabaseException ex) {
             teams = new ArrayList<>();
             JOptionPane.showMessageDialog(this, "Error loading teams: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -74,7 +76,7 @@ public class FrRegisterTeam extends javax.swing.JFrame {
         }
     }
 
-    private String membersToText(List<User> members) {
+    private String membersToText(Collection<User> members) {
         StringJoiner joiner = new StringJoiner(", ");
         for (User member : members) {
             joiner.add(member.getFirstName() + " " + member.getLastName());
@@ -403,7 +405,7 @@ public class FrRegisterTeam extends javax.swing.JFrame {
         } catch (ValidationException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Validation error", JOptionPane.WARNING_MESSAGE);
-        } catch (SQLException ex) {
+        } catch (DatabaseException ex) {
             JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -465,7 +467,7 @@ public class FrRegisterTeam extends javax.swing.JFrame {
         } catch (ValidationException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Validation error", JOptionPane.WARNING_MESSAGE);
-        } catch (SQLException ex) {
+        } catch (DatabaseException ex) {
             JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }

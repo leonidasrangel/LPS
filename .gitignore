@@ -2,3 +2,4 @@ build/
 dist/
 target/
 nbproject/private/
+database.properties/

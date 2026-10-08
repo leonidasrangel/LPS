@@ -8,12 +8,11 @@ package com.mycompany.cpoint.controller;
  *
  * @author Rangel
  */
-
 import com.mycompany.cpoint.dao.TaskDAO;
+import com.mycompany.cpoint.exception.DatabaseException;
 import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.Task;
 import com.mycompany.cpoint.validation.TaskValidator;
-import java.sql.SQLException;
 import java.util.List;
 
 public class TaskController {
@@ -21,7 +20,7 @@ public class TaskController {
     private final TaskDAO taskDAO = new TaskDAO();
     private final TaskValidator taskValidator = new TaskValidator();
 
-    public void saveTask(Task task) throws ValidationException, SQLException {
+    public void saveTask(Task task) throws ValidationException, DatabaseException {
         taskValidator.validate(task);
 
         if (task.getId() == 0) {
@@ -31,12 +30,12 @@ public class TaskController {
         }
     }
 
-    public void deleteTask(int id) throws ValidationException, SQLException {
+    public void deleteTask(int id) throws ValidationException, DatabaseException {
         taskValidator.validateId(id);
         taskDAO.delete(id);
     }
 
-    public List<Task> listTasks() throws SQLException {
+    public List<Task> listTasks() throws DatabaseException {
         return taskDAO.findAll();
     }
 }

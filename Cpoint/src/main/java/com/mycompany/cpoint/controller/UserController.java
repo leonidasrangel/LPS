@@ -12,7 +12,7 @@ import com.mycompany.cpoint.dao.UserDAO;
 import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.User;
 import com.mycompany.cpoint.validation.UserValidator;
-import java.sql.SQLException;
+import com.mycompany.cpoint.exception.DatabaseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +21,7 @@ public class UserController {
     private final UserDAO userDAO = new UserDAO();
     private final UserValidator userValidator = new UserValidator();
 
-    public void saveUser(User user) throws ValidationException, SQLException {
+    public void saveUser(User user) throws ValidationException, DatabaseException {
         userValidator.validate(user);
         checkUniqueness(user);
 
@@ -32,7 +32,7 @@ public class UserController {
         }
     }
 
-    public void deleteUser(int id) throws ValidationException, SQLException {
+    public void deleteUser(int id) throws ValidationException, DatabaseException {
         userValidator.validateId(id);
 
         if (userDAO.isTeamMember(id)) {
@@ -44,11 +44,11 @@ public class UserController {
         userDAO.delete(id);
     }
 
-    public List<User> listUsers() throws SQLException {
+    public List<User> listUsers() throws DatabaseException {
         return userDAO.findAll();
     }
 
-    private void checkUniqueness(User user) throws ValidationException, SQLException {
+    private void checkUniqueness(User user) throws ValidationException, DatabaseException {
         List<String> errors = new ArrayList<>();
 
         if (userDAO.existsByEmail(user.getEmail(), user.getId())) {

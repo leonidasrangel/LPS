@@ -8,18 +8,46 @@ package com.mycompany.cpoint.model;
  *
  * @author Rangel
  */
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "users")
 public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(name = "first_name", nullable = false)
     private String firstName;
+
+    @Column(name = "last_name", nullable = false)
     private String lastName;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false, unique = true)
     private String username;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
     private String department;
+
+    @Column(nullable = false)
     private String gender;
 
-    // Construtor para um usuário NOVO (ainda não salvo no banco, sem id)
+    protected User() {
+        // Required by JPA
+    }
+
     public User(String firstName, String lastName, String email, String username,
             String password, String department, String gender) {
         this.firstName = firstName;
@@ -31,7 +59,6 @@ public class User {
         this.gender = gender;
     }
 
-    // Construtor para um usuário JÁ EXISTENTE (vindo do banco, já tem id)
     public User(int id, String firstName, String lastName, String email, String username,
             String password, String department, String gender) {
         this(firstName, lastName, email, username, password, department, gender);

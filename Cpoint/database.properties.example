@@ -1,0 +1,2 @@
+# Copy this file to database.properties and fill in the password of the cpoint_app user
+db.password=

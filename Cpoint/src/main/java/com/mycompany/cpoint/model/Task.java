@@ -8,13 +8,33 @@ package com.mycompany.cpoint.model;
  *
  * @author Rangel
  */
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name = "tasks")
 public class Task {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String description;
+
+    @Column(nullable = false)
     private String state;
+
+    protected Task() {
+        // Required by JPA
+    }
 
     public Task(String name, String description, String state) {
         this.name = name;

@@ -5,10 +5,10 @@
 package com.mycompany.cpoint.view;
 
 import com.mycompany.cpoint.controller.ProjectController;
+import com.mycompany.cpoint.exception.DatabaseException;
 import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.Project;
 import com.mycompany.cpoint.validation.ValidationUtils;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -49,7 +49,7 @@ public class FrRegisterProject extends javax.swing.JFrame {
 
         try {
             projects = projectController.listProjects();
-        } catch (SQLException ex) {
+        } catch (DatabaseException ex) {
             projects = new ArrayList<>();
             JOptionPane.showMessageDialog(this, "Error loading projects: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -347,7 +347,7 @@ public class FrRegisterProject extends javax.swing.JFrame {
         } catch (ValidationException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Validation error", JOptionPane.WARNING_MESSAGE);
-        } catch (SQLException ex) {
+        } catch (DatabaseException ex) {
             JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -408,7 +408,7 @@ public class FrRegisterProject extends javax.swing.JFrame {
         } catch (ValidationException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Validation error", JOptionPane.WARNING_MESSAGE);
-        } catch (SQLException ex) {
+        } catch (DatabaseException ex) {
             JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }

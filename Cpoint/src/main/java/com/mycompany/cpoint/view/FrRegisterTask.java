@@ -6,7 +6,7 @@ package com.mycompany.cpoint.view;
 
 import com.mycompany.cpoint.controller.TaskController;
 import com.mycompany.cpoint.exception.ValidationException;
-import java.sql.SQLException;
+import com.mycompany.cpoint.exception.DatabaseException;
 import javax.swing.JOptionPane;
 import com.mycompany.cpoint.model.Task;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class FrRegisterTask extends javax.swing.JFrame {
 
         try {
             tasks = taskController.listTasks();
-        } catch (SQLException ex) {
+        } catch (DatabaseException ex) {
             tasks = new ArrayList<>();
             JOptionPane.showMessageDialog(this, "Error loading tasks: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -340,7 +340,7 @@ public class FrRegisterTask extends javax.swing.JFrame {
         } catch (ValidationException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Validation error", JOptionPane.WARNING_MESSAGE);
-        } catch (SQLException ex) {
+        } catch (DatabaseException ex) {
             JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -400,7 +400,7 @@ public class FrRegisterTask extends javax.swing.JFrame {
         } catch (ValidationException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Validation error", JOptionPane.WARNING_MESSAGE);
-        } catch (SQLException ex) {
+        } catch (DatabaseException ex) {
             JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
