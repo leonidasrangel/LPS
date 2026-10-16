@@ -22,6 +22,10 @@ public class UserDAO extends BaseDAO {
         "SELECT COUNT(u) FROM User u WHERE u.username = :value AND u.id <> :ignoredId";
     private static final String TEAM_MEMBER_COUNT_JPQL =
         "SELECT COUNT(t) FROM Team t JOIN t.members m WHERE m.id = :userId";
+    private static final String FIND_BY_EMAIL_JPQL =
+        "SELECT u FROM User u WHERE u.email = :value";
+    private static final String FIND_BY_USERNAME_JPQL =
+        "SELECT u FROM User u WHERE u.username = :value";
 
     public void insert(User user) throws DatabaseException {
         inTransaction("Could not save the user.", em -> em.persist(user));
@@ -30,6 +34,14 @@ public class UserDAO extends BaseDAO {
     public List<User> findAll() throws DatabaseException {
         return query("Could not load the users.", em ->
             em.createQuery("SELECT u FROM User u ORDER BY u.id", User.class).getResultList());
+    }
+
+    public User findByEmail(String email) throws DatabaseException {
+        return findOne(FIND_BY_EMAIL_JPQL, email, "Could not search the user by email.");
+    }
+
+    public User findByUsername(String username) throws DatabaseException {
+        return findOne(FIND_BY_USERNAME_JPQL, username, "Could not search the user by username.");
     }
 
     public void update(User user) throws DatabaseException {
@@ -64,6 +76,14 @@ public class UserDAO extends BaseDAO {
             em.createQuery(TEAM_MEMBER_COUNT_JPQL, Long.class)
                 .setParameter("userId", userId)
                 .getSingleResult()) > 0;
+    }
+
+    private User findOne(String jpql, String value, String errorMessage) throws DatabaseException {
+        List<User> found = query(errorMessage, em ->
+            em.createQuery(jpql, User.class)
+                .setParameter("value", value)
+                .getResultList());
+        return found.isEmpty() ? null : found.get(0);
     }
 
     private long countMatches(String jpql, String value, int ignoredId, String errorMessage)

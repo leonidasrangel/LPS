@@ -8,13 +8,20 @@ package com.mycompany.cpoint.view;
  *
  * @author Rangel
  */
+import com.mycompany.cpoint.controller.AuthController;
+import com.mycompany.cpoint.exception.AuthenticationException;
+import com.mycompany.cpoint.exception.DatabaseException;
+import com.mycompany.cpoint.exception.ValidationException;
+import com.mycompany.cpoint.model.User;
+import javax.swing.JOptionPane;
+
 public class FrLogin extends javax.swing.JFrame {
 
-    /**
-     * Creates new form FrLogin
-     */
+    private final AuthController authController = new AuthController();
+
     public FrLogin() {
         initComponents();
+        getRootPane().setDefaultButton(btnSignIn);
     }
 
     /**
@@ -50,6 +57,11 @@ public class FrLogin extends javax.swing.JFrame {
         lblPassword.setText("Password:");
 
         btnSignIn.setText("Sign in");
+        btnSignIn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSignInActionPerformed(evt);
+            }
+        });
 
         chbRemember.setText("Remember");
 
@@ -139,10 +151,34 @@ public class FrLogin extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnSignInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignInActionPerformed
+        String login = txtEmail.getText();
+        String password = new String(txtPassword.getPassword());
+
+        try {
+            User user = authController.login(login, password);
+            JOptionPane.showMessageDialog(this,
+                    "Welcome, " + user.getFirstName() + "! You are signed in as " + user.getRole() + ".");
+        } catch (ValidationException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Validation error", JOptionPane.WARNING_MESSAGE);
+        } catch (AuthenticationException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Sign in failed", JOptionPane.ERROR_MESSAGE);
+            txtPassword.setText("");
+            txtPassword.requestFocus();
+        } catch (DatabaseException ex) {
+            JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnSignInActionPerformed
+
     /**
      * @param args the command line arguments
      */
-
+        public static void main(String[] args) {
+        java.awt.EventQueue.invokeLater(() -> new FrLogin().setVisible(true));
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSignIn;

@@ -8,7 +8,6 @@ package com.mycompany.cpoint.validation;
  *
  * @author Rangel
  */
-
 import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.User;
 import java.util.ArrayList;
@@ -17,8 +16,8 @@ import java.util.regex.Pattern;
 
 public class UserValidator {
 
-    private static final Pattern EMAIL_PATTERN =
-        Pattern.compile("^[\\w.+-]+@[\\w-]+(\\.[\\w-]+)*\\.[a-zA-Z]{2,}$");
+    private static final Pattern EMAIL_PATTERN
+            = Pattern.compile("^[\\w.+-]+@[\\w-]+(\\.[\\w-]+)*\\.[a-zA-Z]{2,}$");
     private static final int MIN_PASSWORD_LENGTH = 6;
 
     public void validate(User user) throws ValidationException {
@@ -52,6 +51,9 @@ public class UserValidator {
         }
         if (ValidationUtils.isBlank(user.getGender())) {
             errors.add("Select the gender.");
+        }
+        if (user.getRole() == null) {
+            errors.add("Select the role.");
         }
 
         if (!errors.isEmpty()) {

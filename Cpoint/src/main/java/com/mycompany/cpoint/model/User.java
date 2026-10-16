@@ -14,6 +14,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 @Entity
 @Table(name = "users")
@@ -44,12 +46,16 @@ public class User {
     @Column(nullable = false)
     private String gender;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
     protected User() {
         // Required by JPA
     }
 
     public User(String firstName, String lastName, String email, String username,
-            String password, String department, String gender) {
+            String password, String department, String gender, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -57,11 +63,12 @@ public class User {
         this.password = password;
         this.department = department;
         this.gender = gender;
+        this.role = role;
     }
 
     public User(int id, String firstName, String lastName, String email, String username,
-            String password, String department, String gender) {
-        this(firstName, lastName, email, username, password, department, gender);
+            String password, String department, String gender, Role role) {
+        this(firstName, lastName, email, username, password, department, gender, role);
         this.id = id;
     }
 
@@ -123,6 +130,14 @@ public class User {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     @Override

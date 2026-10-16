@@ -5,30 +5,26 @@
 package com.mycompany.cpoint.view;
 
 import com.mycompany.cpoint.controller.UserController;
-import com.mycompany.cpoint.exception.ValidationException;
-import com.mycompany.cpoint.model.User;
 import com.mycompany.cpoint.exception.DatabaseException;
+import com.mycompany.cpoint.exception.ValidationException;
+import com.mycompany.cpoint.model.Role;
+import com.mycompany.cpoint.model.User;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author Rangel
- */
 public class FrRegisterUser extends javax.swing.JFrame {
 
     private final UserController userController = new UserController();
     private List<User> users = new ArrayList<>();
     private User editingUser;
 
-    /**
-     * Creates new form FrRegisterUser
-     */
     public FrRegisterUser() {
         initComponents();
+        cmbRole.setModel(new DefaultComboBoxModel<>(Role.values()));
         tblUsers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         refreshTable();
         clearFields();
@@ -56,7 +52,8 @@ public class FrRegisterUser extends javax.swing.JFrame {
                 user.getEmail(),
                 user.getUsername(),
                 user.getDepartment(),
-                user.getGender()
+                user.getGender(),
+                user.getRole()
             });
         }
     }
@@ -77,6 +74,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
         txtPassword.setText("");
         txtConfirmPassword.setText("");
         cmbDepartment.setSelectedIndex(-1);
+        cmbRole.setSelectedIndex(-1);
         bgGender.clearSelection();
     }
 
@@ -88,6 +86,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
         txtPassword.setEnabled(enabled);
         txtConfirmPassword.setEnabled(enabled);
         cmbDepartment.setEnabled(enabled);
+        cmbRole.setEnabled(enabled);
         rdbMan.setEnabled(enabled);
         rdbWoman.setEnabled(enabled);
         rdbNotDisclose.setEnabled(enabled);
@@ -111,6 +110,8 @@ public class FrRegisterUser extends javax.swing.JFrame {
 
         cmbDepartment.setSelectedIndex(-1);
         cmbDepartment.setSelectedItem(user.getDepartment());
+
+        cmbRole.setSelectedItem(user.getRole());
 
         String gender = user.getGender();
         if (rdbMan.getText().equals(gender)) {
@@ -143,12 +144,13 @@ public class FrRegisterUser extends javax.swing.JFrame {
         String username = txtUsername.getText();
         String department = (String) cmbDepartment.getSelectedItem();
         String gender = getSelectedGender();
+        Role role = (Role) cmbRole.getSelectedItem();
 
         if (editingUser == null) {
-            return new User(firstName, lastName, email, username, password, department, gender);
+            return new User(firstName, lastName, email, username, password, department, gender, role);
         }
         return new User(editingUser.getId(), firstName, lastName, email, username,
-                password, department, gender);
+                password, department, gender, role);
     }
 
     /**
@@ -181,14 +183,16 @@ public class FrRegisterUser extends javax.swing.JFrame {
         cmbDepartment = new javax.swing.JComboBox<>();
         txtPassword = new javax.swing.JPasswordField();
         txtConfirmPassword = new javax.swing.JPasswordField();
-        btnNew = new javax.swing.JButton();
-        btnEdit = new javax.swing.JButton();
-        btnDelete = new javax.swing.JButton();
+        lblRole = new javax.swing.JLabel();
+        cmbRole = new javax.swing.JComboBox<>();
+        lblIcon = new javax.swing.JLabel();
         btnCancel = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
         scrUsers = new javax.swing.JScrollPane();
         tblUsers = new javax.swing.JTable();
-        lblIcon = new javax.swing.JLabel();
+        btnEdit = new javax.swing.JButton();
+        btnNew = new javax.swing.JButton();
+        btnDelete = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -208,7 +212,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
 
         lblConfirmPassword.setText("Confirm Password:");
 
-        lblDepartment.setText("Departament:");
+        lblDepartment.setText("Department:");
 
         lblUserName.setText("Username:");
 
@@ -225,63 +229,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
 
         cmbDepartment.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Administration", "Accounting", "Finance", "Human Resources", "Information Technology", "Procurement" }));
 
-        btnNew.setText("New");
-        btnNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNewActionPerformed(evt);
-            }
-        });
-
-        btnEdit.setText("Edit");
-        btnEdit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditActionPerformed(evt);
-            }
-        });
-
-        btnDelete.setText("Delete");
-        btnDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDeleteActionPerformed(evt);
-            }
-        });
-
-        btnCancel.setText("Cancel");
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
-            }
-        });
-
-        btnSave.setText("Save");
-        btnSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveActionPerformed(evt);
-            }
-        });
-
-        tblUsers.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "ID", "First name", "Last name", "Email", "Username", "Department", "Gender"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
-        tblUsers.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblUsersMouseClicked(evt);
-            }
-        });
-        scrUsers.setViewportView(tblUsers);
+        lblRole.setText("Role:");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -296,23 +244,6 @@ public class FrRegisterUser extends javax.swing.JFrame {
                     .addComponent(txtLastName, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(txtFirstName)))
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(lblGender)
-                .addGap(69, 69, 69)
-                .addComponent(rdbMan)
-                .addGap(18, 18, 18)
-                .addComponent(rdbWoman)
-                .addGap(18, 18, 18)
-                .addComponent(rdbNotDisclose)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblConfirmPassword)
-                    .addComponent(lblDepartment))
-                .addGap(10, 10, 10)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cmbDepartment, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtConfirmPassword)))
-            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblUserName)
@@ -323,16 +254,24 @@ public class FrRegisterUser extends javax.swing.JFrame {
                     .addComponent(txtUsername)
                     .addComponent(txtPassword)))
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(btnNew)
+                .addComponent(lblGender)
+                .addGap(69, 69, 69)
+                .addComponent(rdbMan)
                 .addGap(18, 18, 18)
-                .addComponent(btnEdit)
+                .addComponent(rdbWoman)
                 .addGap(18, 18, 18)
-                .addComponent(btnDelete)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnCancel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnSave))
-            .addComponent(scrUsers, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 573, Short.MAX_VALUE)
+                .addComponent(rdbNotDisclose)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblConfirmPassword)
+                    .addComponent(lblDepartment)
+                    .addComponent(lblRole))
+                .addGap(10, 10, 10)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cmbRole, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cmbDepartment, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtConfirmPassword)))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -373,18 +312,78 @@ public class FrRegisterUser extends javax.swing.JFrame {
                     .addComponent(cmbDepartment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSave)
-                    .addComponent(btnCancel)
-                    .addComponent(btnNew)
-                    .addComponent(btnEdit)
-                    .addComponent(btnDelete))
-                .addGap(18, 18, 18)
-                .addComponent(scrUsers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(lblRole)
+                    .addComponent(cmbRole, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(36, Short.MAX_VALUE))
         );
 
         lblIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/cpoint/resources/logoTest.jpg"))); // NOI18N
         lblIcon.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        btnCancel.setText("Cancel");
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
+
+        btnSave.setText("Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
+
+        tblUsers.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "First name", "Last name", "Email", "Username", "Department", "Gender", "Role"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
+            };
+            boolean[] canEdit = new boolean [] {
+                true, true, true, true, true, true, true, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblUsers.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblUsersMouseClicked(evt);
+            }
+        });
+        scrUsers.setViewportView(tblUsers);
+
+        btnEdit.setText("Edit");
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditActionPerformed(evt);
+            }
+        });
+
+        btnNew.setText("New");
+        btnNew.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNewActionPerformed(evt);
+            }
+        });
+
+        btnDelete.setText("Delete");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -397,7 +396,18 @@ public class FrRegisterUser extends javax.swing.JFrame {
                         .addComponent(lblIcon)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnNew)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnEdit)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnDelete)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnCancel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnSave))
+                    .addComponent(scrUsers, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 573, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -409,6 +419,15 @@ public class FrRegisterUser extends javax.swing.JFrame {
                     .addComponent(lblIcon, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSave)
+                    .addComponent(btnCancel)
+                    .addComponent(btnNew)
+                    .addComponent(btnEdit)
+                    .addComponent(btnDelete))
+                .addGap(18, 18, 18)
+                .addComponent(scrUsers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -531,6 +550,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
     private javax.swing.JButton btnNew;
     private javax.swing.JButton btnSave;
     private javax.swing.JComboBox<String> cmbDepartment;
+    private javax.swing.JComboBox<Role> cmbRole;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblConfirmPassword;
     private javax.swing.JLabel lblDepartment;
@@ -540,6 +560,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
     private javax.swing.JLabel lblIcon;
     private javax.swing.JLabel lblLastName;
     private javax.swing.JLabel lblPassword;
+    private javax.swing.JLabel lblRole;
     private javax.swing.JLabel lblTitle;
     private javax.swing.JLabel lblUserName;
     private javax.swing.JRadioButton rdbMan;
