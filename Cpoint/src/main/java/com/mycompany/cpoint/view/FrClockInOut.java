@@ -4,17 +4,25 @@
  */
 package com.mycompany.cpoint.view;
 
-/**
- *
- * @author Rangel
- */
+import com.mycompany.cpoint.controller.AuthController;
+import com.mycompany.cpoint.model.User;
+import com.mycompany.cpoint.util.UserSession;
+import javax.swing.JOptionPane;
+
 public class FrClockInOut extends javax.swing.JFrame {
 
-    /**
-     * Creates new form FrClockInOut
-     */
+    private final AuthController authController = new AuthController();
+
     public FrClockInOut() {
         initComponents();
+        showCurrentUser();
+        setLocationRelativeTo(null);
+    }
+
+    private void showCurrentUser() {
+        User user = UserSession.getCurrentUser();
+        lblNameUser.setText(user.getFirstName() + " " + user.getLastName());
+        lblDepartamentUser.setText(user.getDepartment());
     }
 
     /**
@@ -34,6 +42,7 @@ public class FrClockInOut extends javax.swing.JFrame {
         btnClockInOut = new javax.swing.JButton();
         lblDate = new javax.swing.JLabel();
         lblHour = new javax.swing.JLabel();
+        btnSignOut = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -54,6 +63,13 @@ public class FrClockInOut extends javax.swing.JFrame {
 
         lblHour.setFont(new java.awt.Font("Calibri", 0, 48)); // NOI18N
         lblHour.setText("10:20");
+
+        btnSignOut.setText("Sign out");
+        btnSignOut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSignOutActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlClockInOutLayout = new javax.swing.GroupLayout(pnlClockInOut);
         pnlClockInOut.setLayout(pnlClockInOutLayout);
@@ -80,6 +96,9 @@ public class FrClockInOut extends javax.swing.JFrame {
                             .addComponent(lblHour))
                         .addGap(0, 129, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlClockInOutLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(btnSignOut))
         );
         pnlClockInOutLayout.setVerticalGroup(
             pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -99,7 +118,9 @@ public class FrClockInOut extends javax.swing.JFrame {
                 .addComponent(lblHour)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnClockInOut, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(94, 94, 94))
+                .addGap(65, 65, 65)
+                .addComponent(btnSignOut)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -122,13 +143,25 @@ public class FrClockInOut extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnSignOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignOutActionPerformed
+        int answer = JOptionPane.showConfirmDialog(this, "Do you want to sign out?",
+                "Sign out", JOptionPane.YES_NO_OPTION);
+        if (answer != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        authController.logout();
+        new FrLogin().setVisible(true);
+        dispose();
+    }//GEN-LAST:event_btnSignOutActionPerformed
+
     /**
      * @param args the command line arguments
      */
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClockInOut;
+    private javax.swing.JButton btnSignOut;
     private javax.swing.JLabel lblDate;
     private javax.swing.JLabel lblDepartamentUser;
     private javax.swing.JLabel lblHour;

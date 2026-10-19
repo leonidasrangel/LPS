@@ -12,7 +12,7 @@ import com.mycompany.cpoint.controller.AuthController;
 import com.mycompany.cpoint.exception.AuthenticationException;
 import com.mycompany.cpoint.exception.DatabaseException;
 import com.mycompany.cpoint.exception.ValidationException;
-import com.mycompany.cpoint.model.User;
+import com.mycompany.cpoint.util.UserSession;
 import javax.swing.JOptionPane;
 
 public class FrLogin extends javax.swing.JFrame {
@@ -21,6 +21,7 @@ public class FrLogin extends javax.swing.JFrame {
 
     public FrLogin() {
         initComponents();
+        setLocationRelativeTo(null);
         getRootPane().setDefaultButton(btnSignIn);
     }
 
@@ -152,13 +153,13 @@ public class FrLogin extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSignInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignInActionPerformed
+
         String login = txtEmail.getText();
         String password = new String(txtPassword.getPassword());
 
         try {
-            User user = authController.login(login, password);
-            JOptionPane.showMessageDialog(this,
-                    "Welcome, " + user.getFirstName() + "! You are signed in as " + user.getRole() + ".");
+            authController.login(login, password);
+            openHomeScreen();
         } catch (ValidationException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Validation error", JOptionPane.WARNING_MESSAGE);
@@ -172,12 +173,13 @@ public class FrLogin extends javax.swing.JFrame {
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnSignInActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-        public static void main(String[] args) {
-        java.awt.EventQueue.invokeLater(() -> new FrLogin().setVisible(true));
+    private void openHomeScreen() {
+        if (UserSession.isAdmin()) {
+            new FrCrudAdministrator().setVisible(true);
+        } else {
+            new FrClockInOut().setVisible(true);
+        }
+        dispose();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

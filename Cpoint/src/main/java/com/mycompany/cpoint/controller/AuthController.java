@@ -13,8 +13,10 @@ import com.mycompany.cpoint.exception.AuthenticationException;
 import com.mycompany.cpoint.exception.DatabaseException;
 import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.User;
+import com.mycompany.cpoint.util.UserSession;
 import com.mycompany.cpoint.validation.ValidationUtils;
 import java.util.ArrayList;
+
 import java.util.List;
 
 public class AuthController {
@@ -25,6 +27,7 @@ public class AuthController {
 
     public User login(String login, String password)
             throws ValidationException, AuthenticationException, DatabaseException {
+        UserSession.end();
         validateInput(login, password);
 
         String typedLogin = login.trim();
@@ -36,7 +39,13 @@ public class AuthController {
         if (user == null || !passwordMatches(password, user.getPassword())) {
             throw new AuthenticationException(INVALID_CREDENTIALS);
         }
+
+        UserSession.start(user);
         return user;
+    }
+
+    public void logout() {
+        UserSession.end();
     }
 
     private void validateInput(String login, String password) throws ValidationException {

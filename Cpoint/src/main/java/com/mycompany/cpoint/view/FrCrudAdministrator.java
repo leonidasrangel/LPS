@@ -4,17 +4,16 @@
  */
 package com.mycompany.cpoint.view;
 
-/**
- *
- * @author Rangel
- */
+import com.mycompany.cpoint.controller.AuthController;
+import javax.swing.JOptionPane;
+
 public class FrCrudAdministrator extends javax.swing.JFrame {
 
-    /**
-     * Creates new form FrCrudAdministrator
-     */
+    private final AuthController authController = new AuthController();
+
     public FrCrudAdministrator() {
         initComponents();
+        setLocationRelativeTo(null);
     }
 
     /**
@@ -53,6 +52,7 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         btnRegisterTeam = new javax.swing.JButton();
         btnViewProjects = new javax.swing.JButton();
         btnViewTasks = new javax.swing.JButton();
+        btnSignOut = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -270,6 +270,13 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
 
         btnViewTasks.setText("View Tasks");
 
+        btnSignOut.setText("Sign out");
+        btnSignOut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSignOutActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlPanelCrudLayout = new javax.swing.GroupLayout(pnlPanelCrud);
         pnlPanelCrud.setLayout(pnlPanelCrudLayout);
         pnlPanelCrudLayout.setHorizontalGroup(
@@ -277,6 +284,7 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
             .addGroup(pnlPanelCrudLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlPanelCrudLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnViewTasks, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(pnlPanelCrudLayout.createSequentialGroup()
                         .addGroup(pnlPanelCrudLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(lblIcon)
@@ -285,9 +293,9 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
                             .addComponent(btnRegisterTask, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnRegisterTeam, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnDashboard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnViewProjects, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(btnViewTasks, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(btnViewProjects, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnSignOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         pnlPanelCrudLayout.setVerticalGroup(
@@ -309,7 +317,9 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
                 .addComponent(btnViewTasks)
                 .addGap(18, 18, 18)
                 .addComponent(btnViewProjects)
-                .addContainerGap(98, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(btnSignOut)
+                .addContainerGap(57, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout pnlMainPanelLayout = new javax.swing.GroupLayout(pnlMainPanel);
@@ -353,40 +363,17 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FrCrudAdministrator.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FrCrudAdministrator.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FrCrudAdministrator.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FrCrudAdministrator.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    private void btnSignOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignOutActionPerformed
+        int answer = JOptionPane.showConfirmDialog(this, "Do you want to sign out?",
+                "Sign out", JOptionPane.YES_NO_OPTION);
+        if (answer != JOptionPane.YES_OPTION) {
+            return;
         }
-        //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new FrCrudAdministrator().setVisible(true);
-            }
-        });
-    }
+        authController.logout();
+        new FrLogin().setVisible(true);
+        dispose();
+    }//GEN-LAST:event_btnSignOutActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDashboard;
@@ -394,6 +381,7 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
     private javax.swing.JButton btnRegisterTask;
     private javax.swing.JButton btnRegisterTeam;
     private javax.swing.JButton btnRegisterUser;
+    private javax.swing.JButton btnSignOut;
     private javax.swing.JButton btnViewProjects;
     private javax.swing.JButton btnViewTasks;
     private javax.swing.JPanel jPanel2;
