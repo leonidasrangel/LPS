@@ -144,7 +144,7 @@ public class FrRegisterTask extends javax.swing.JFrame {
         btnEdit = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         lblTitleTask.setFont(new java.awt.Font("Arial Narrow", 1, 36)); // NOI18N
         lblTitleTask.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -424,10 +424,6 @@ public class FrRegisterTask extends javax.swing.JFrame {
             return rdbCompleted.getText();
         }
         return null;
-    }
-
-    public static void main(String[] args) {
-        java.awt.EventQueue.invokeLater(() -> new FrRegisterTask().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

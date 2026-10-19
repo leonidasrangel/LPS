@@ -165,7 +165,7 @@ public class FrRegisterProject extends javax.swing.JFrame {
         scrProjects = new javax.swing.JScrollPane();
         tblProjects = new javax.swing.JTable();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         lblTitleProject.setFont(new java.awt.Font("Arial Narrow", 1, 36)); // NOI18N
         lblTitleProject.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -419,13 +419,6 @@ public class FrRegisterProject extends javax.swing.JFrame {
         clearFields();
         enableFields(false);
     }//GEN-LAST:event_btnCancelActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        java.awt.EventQueue.invokeLater(() -> new FrRegisterProject().setVisible(true));
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;

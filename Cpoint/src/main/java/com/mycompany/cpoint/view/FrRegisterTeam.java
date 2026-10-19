@@ -157,7 +157,7 @@ public class FrRegisterTeam extends javax.swing.JFrame {
         scrTeams = new javax.swing.JScrollPane();
         tblTeams = new javax.swing.JTable();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         lblIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/cpoint/resources/logoTest.jpg"))); // NOI18N
         lblIcon.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -478,14 +478,6 @@ public class FrRegisterTeam extends javax.swing.JFrame {
         clearFields();
         enableFields(false);
     }//GEN-LAST:event_btnCancelActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        java.awt.EventQueue.invokeLater(() -> new FrRegisterTeam().setVisible(true));
-    }
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddMember;

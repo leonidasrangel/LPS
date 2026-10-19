@@ -194,7 +194,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
         btnNew = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
 
         lblTitle.setFont(new java.awt.Font("Arial Narrow", 1, 36)); // NOI18N
@@ -536,12 +536,6 @@ public class FrRegisterUser extends javax.swing.JFrame {
         }
         return null;
     }
-
-    public static void main(String[] args) {
-        java.awt.EventQueue.invokeLater(() -> new FrRegisterUser().setVisible(true));
-    }
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgGender;
     private javax.swing.JButton btnCancel;

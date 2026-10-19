@@ -5,15 +5,41 @@
 package com.mycompany.cpoint.view;
 
 import com.mycompany.cpoint.controller.AuthController;
+import java.util.function.Supplier;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class FrCrudAdministrator extends javax.swing.JFrame {
 
     private final AuthController authController = new AuthController();
 
+    private JFrame userScreen;
+    private JFrame taskScreen;
+    private JFrame projectScreen;
+    private JFrame teamScreen;
+
     public FrCrudAdministrator() {
         initComponents();
         setLocationRelativeTo(null);
+    }
+
+    private JFrame openScreen(JFrame screen, Supplier<JFrame> createScreen) {
+        if (screen == null || !screen.isDisplayable()) {
+            screen = createScreen.get();
+            screen.setLocationRelativeTo(this);
+        }
+        screen.setVisible(true);
+        screen.toFront();
+        return screen;
+    }
+
+    private void closeOpenScreens() {
+        JFrame[] screens = {userScreen, taskScreen, projectScreen, teamScreen};
+        for (JFrame screen : screens) {
+            if (screen != null) {
+                screen.dispose();
+            }
+        }
     }
 
     /**
@@ -259,12 +285,32 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         btnDashboard.setText("Dashboard");
 
         btnRegisterUser.setText("Register User");
+        btnRegisterUser.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegisterUserActionPerformed(evt);
+            }
+        });
 
         btnRegisterTask.setText("Register Task");
+        btnRegisterTask.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegisterTaskActionPerformed(evt);
+            }
+        });
 
         btnRegisterProject.setText("Register Project");
+        btnRegisterProject.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegisterProjectActionPerformed(evt);
+            }
+        });
 
         btnRegisterTeam.setText("Register Team");
+        btnRegisterTeam.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegisterTeamActionPerformed(evt);
+            }
+        });
 
         btnViewProjects.setText("View Projects");
 
@@ -371,9 +417,26 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         }
 
         authController.logout();
+        closeOpenScreens();
         new FrLogin().setVisible(true);
         dispose();
     }//GEN-LAST:event_btnSignOutActionPerformed
+
+    private void btnRegisterUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterUserActionPerformed
+        userScreen = openScreen(userScreen, FrRegisterUser::new);
+    }//GEN-LAST:event_btnRegisterUserActionPerformed
+
+    private void btnRegisterTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterTaskActionPerformed
+        taskScreen = openScreen(taskScreen, FrRegisterTask::new);
+    }//GEN-LAST:event_btnRegisterTaskActionPerformed
+
+    private void btnRegisterProjectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterProjectActionPerformed
+        projectScreen = openScreen(projectScreen, FrRegisterProject::new);
+    }//GEN-LAST:event_btnRegisterProjectActionPerformed
+
+    private void btnRegisterTeamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterTeamActionPerformed
+        teamScreen = openScreen(teamScreen, FrRegisterTeam::new);
+    }//GEN-LAST:event_btnRegisterTeamActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDashboard;
