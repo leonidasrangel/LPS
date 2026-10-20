@@ -155,10 +155,6 @@ public class FrClockInOut extends javax.swing.JFrame {
         dispose();
     }//GEN-LAST:event_btnSignOutActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClockInOut;
     private javax.swing.JButton btnSignOut;

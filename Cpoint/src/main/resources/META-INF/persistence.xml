@@ -7,7 +7,7 @@
     <persistence-unit name="cpointPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
-        <!-- Entities are listed here as each one is migrated to JPA -->
+        <!-- Entities managed by this persistence unit -->
         <class>com.mycompany.cpoint.model.Task</class>
         <class>com.mycompany.cpoint.model.Project</class>
         <class>com.mycompany.cpoint.model.User</class>

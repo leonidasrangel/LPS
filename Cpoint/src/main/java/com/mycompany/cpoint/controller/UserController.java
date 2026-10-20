@@ -9,14 +9,22 @@ package com.mycompany.cpoint.controller;
  * @author Rangel
  */
 import com.mycompany.cpoint.dao.UserDAO;
+import com.mycompany.cpoint.exception.DatabaseException;
 import com.mycompany.cpoint.exception.ValidationException;
+import com.mycompany.cpoint.model.Role;
 import com.mycompany.cpoint.model.User;
 import com.mycompany.cpoint.validation.UserValidator;
-import com.mycompany.cpoint.exception.DatabaseException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserController {
+
+    private static final String DEFAULT_ADMIN_USERNAME = "admin";
+    private static final String DEFAULT_ADMIN_PASSWORD = "admin123";
+    private static final String DEFAULT_ADMIN_EMAIL = "admin@cpoint.com";
+    // Department and gender must match the options of the registration screen
+    private static final String DEFAULT_ADMIN_DEPARTMENT = "Administration";
+    private static final String DEFAULT_ADMIN_GENDER = "Not disclose";
 
     private final UserDAO userDAO = new UserDAO();
     private final UserValidator userValidator = new UserValidator();
@@ -37,8 +45,8 @@ public class UserController {
 
         if (userDAO.isTeamMember(id)) {
             throw new ValidationException(List.of(
-                "This user is a member of a team and cannot be deleted. "
-                + "Remove them from the team first."));
+                    "This user is a member of a team and cannot be deleted. "
+                    + "Remove them from the team first."));
         }
 
         userDAO.delete(id);
@@ -46,6 +54,24 @@ public class UserController {
 
     public List<User> listUsers() throws DatabaseException {
         return userDAO.findAll();
+    }
+
+    public User createDefaultAdminIfNeeded() throws DatabaseException {
+        if (userDAO.count() > 0) {
+            return null;
+        }
+
+        User admin = new User("System", "Administrator", DEFAULT_ADMIN_EMAIL,
+                DEFAULT_ADMIN_USERNAME, DEFAULT_ADMIN_PASSWORD,
+                DEFAULT_ADMIN_DEPARTMENT, DEFAULT_ADMIN_GENDER, Role.ADMIN);
+
+        try {
+            saveUser(admin);
+        } catch (ValidationException ex) {
+            throw new IllegalStateException(
+                    "The default administrator data is invalid: " + ex.getMessage(), ex);
+        }
+        return admin;
     }
 
     private void checkUniqueness(User user) throws ValidationException, DatabaseException {

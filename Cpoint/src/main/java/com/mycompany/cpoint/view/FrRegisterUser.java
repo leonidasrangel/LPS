@@ -138,10 +138,10 @@ public class FrRegisterUser extends javax.swing.JFrame {
             throw new ValidationException(List.of("The passwords do not match."));
         }
 
-        String firstName = txtFirstName.getText();
-        String lastName = txtLastName.getText();
-        String email = txtEmail.getText();
-        String username = txtUsername.getText();
+        String firstName = txtFirstName.getText().trim();
+        String lastName = txtLastName.getText().trim();
+        String email = txtEmail.getText().trim();
+        String username = txtUsername.getText().trim();
         String department = (String) cmbDepartment.getSelectedItem();
         String gender = getSelectedGender();
         Role role = (Role) cmbRole.getSelectedItem();
@@ -435,8 +435,6 @@ public class FrRegisterUser extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        //User u = camposparaobjeto() <-- pega os textos da tela
-        //validateUser vu <- valida os dados que o código pegou. se setiver ok, entrega para o controller, senao, dispara exception
 
         try {
             User user = fieldsToObject();

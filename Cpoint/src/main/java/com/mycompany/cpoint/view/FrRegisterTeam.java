@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.mycompany.cpoint.view;
-
 import com.mycompany.cpoint.controller.TeamController;
 import com.mycompany.cpoint.controller.UserController;
 import com.mycompany.cpoint.exception.DatabaseException;
