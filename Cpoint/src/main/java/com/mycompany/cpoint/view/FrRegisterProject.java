@@ -5,9 +5,11 @@
 package com.mycompany.cpoint.view;
 
 import com.mycompany.cpoint.controller.ProjectController;
+import com.mycompany.cpoint.controller.UserController;
 import com.mycompany.cpoint.exception.DatabaseException;
 import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.Project;
+import com.mycompany.cpoint.model.User;
 import com.mycompany.cpoint.validation.ValidationUtils;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -15,32 +17,46 @@ import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author Rangel
- */
 public class FrRegisterProject extends javax.swing.JFrame {
 
     private static final DateTimeFormatter DATE_FORMAT
             = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
 
     private final ProjectController projectController = new ProjectController();
+    private final UserController userController = new UserController();
     private List<Project> projects = new ArrayList<>();
+    private final List<User> selectedMembers = new ArrayList<>();
     private Project editingProject;
 
-    /**
-     * Creates new form FrRegisterProject
-     */
     public FrRegisterProject() {
         initComponents();
         tblProjects.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        loadUsers();
         refreshTable();
         clearFields();
         enableFields(false);
+    }
+
+    private void loadUsers() {
+        cmbUsers.removeAllItems();
+
+        List<User> users;
+        try {
+            users = userController.listUsers();
+        } catch (DatabaseException ex) {
+            JOptionPane.showMessageDialog(this, "Error loading users: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        for (int i = 0; i < users.size(); i++) {
+            cmbUsers.addItem(users.get(i));
+        }
     }
 
     private void refreshTable() {
@@ -56,15 +72,28 @@ public class FrRegisterProject extends javax.swing.JFrame {
             return;
         }
 
-        for (Project project : projects) {
+        for (int i = 0; i < projects.size(); i++) {
+            Project project = projects.get(i);
             model.addRow(new Object[]{
                 project.getId(),
                 project.getName(),
                 project.getDescription(),
                 formatDate(project.getStartDate()),
-                formatDate(project.getEndDate())
+                formatDate(project.getEndDate()),
+                membersToText(project.getMembers())
             });
         }
+    }
+
+    private String membersToText(Set<User> members) {
+        StringBuilder text = new StringBuilder();
+        for (User member : members) {
+            if (text.length() > 0) {
+                text.append(", ");
+            }
+            text.append(member.getFirstName()).append(" ").append(member.getLastName());
+        }
+        return text.toString();
     }
 
     private Project getSelectedObjectFromGrid() {
@@ -80,6 +109,8 @@ public class FrRegisterProject extends javax.swing.JFrame {
         txtDescriptionProject.setText("");
         txtStartDate.setText("");
         txtEndDate.setText("");
+        cmbUsers.setSelectedIndex(-1);
+        selectedMembers.clear();
     }
 
     private void enableFields(boolean enabled) {
@@ -87,6 +118,9 @@ public class FrRegisterProject extends javax.swing.JFrame {
         txtDescriptionProject.setEnabled(enabled);
         txtStartDate.setEnabled(enabled);
         txtEndDate.setEnabled(enabled);
+        cmbUsers.setEnabled(enabled);
+        btnAddMember.setEnabled(enabled);
+        btnRemoveMember.setEnabled(enabled);
 
         btnSave.setEnabled(enabled);
         btnCancel.setEnabled(enabled);
@@ -102,6 +136,10 @@ public class FrRegisterProject extends javax.swing.JFrame {
         txtDescriptionProject.setText(project.getDescription());
         txtStartDate.setText(formatDate(project.getStartDate()));
         txtEndDate.setText(formatDate(project.getEndDate()));
+
+        cmbUsers.setSelectedIndex(-1);
+        selectedMembers.clear();
+        selectedMembers.addAll(project.getMembers());
     }
 
     private Project fieldsToObject() throws ValidationException {
@@ -116,10 +154,17 @@ public class FrRegisterProject extends javax.swing.JFrame {
         String name = txtNameProject.getText();
         String description = txtDescriptionProject.getText();
 
+        Project project;
         if (editingProject == null) {
-            return new Project(name, description, startDate, endDate);
+            project = new Project(name, description, startDate, endDate);
+        } else {
+            project = new Project(editingProject.getId(), name, description, startDate, endDate);
         }
-        return new Project(editingProject.getId(), name, description, startDate, endDate);
+
+        for (int i = 0; i < selectedMembers.size(); i++) {
+            project.addMember(selectedMembers.get(i));
+        }
+        return project;
     }
 
     private LocalDate parseDate(String text, String fieldLabel, List<String> errors) {
@@ -135,7 +180,10 @@ public class FrRegisterProject extends javax.swing.JFrame {
     }
 
     private String formatDate(LocalDate date) {
-        return date != null ? date.format(DATE_FORMAT) : "";
+        if (date == null) {
+            return "";
+        }
+        return date.format(DATE_FORMAT);
     }
 
     /**
@@ -162,6 +210,11 @@ public class FrRegisterProject extends javax.swing.JFrame {
         btnNew = new javax.swing.JButton();
         btnEdit = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
+        lblSelectMember = new javax.swing.JLabel();
+        cmbUsers = new javax.swing.JComboBox<>();
+        btnAddMember = new javax.swing.JButton();
+        btnRemoveMember = new javax.swing.JButton();
+        btnListMembers = new javax.swing.JButton();
         scrProjects = new javax.swing.JScrollPane();
         tblProjects = new javax.swing.JTable();
 
@@ -215,6 +268,29 @@ public class FrRegisterProject extends javax.swing.JFrame {
             }
         });
 
+        lblSelectMember.setText("Select Member:");
+
+        btnAddMember.setText("Add Member");
+        btnAddMember.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddMemberActionPerformed(evt);
+            }
+        });
+
+        btnRemoveMember.setText("Remove Member");
+        btnRemoveMember.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveMemberActionPerformed(evt);
+            }
+        });
+
+        btnListMembers.setText("List Member");
+        btnListMembers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnListMembersActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -226,15 +302,16 @@ public class FrRegisterProject extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(lblNameProject)
                         .addGap(18, 18, 18)
-                        .addComponent(txtNameProject, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE))
+                        .addComponent(txtNameProject, javax.swing.GroupLayout.DEFAULT_SIZE, 564, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(lblStartDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(131, 131, 131)
+                        .addComponent(lblStartDate, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
                         .addComponent(txtStartDate, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(lblEndDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(12, 12, 12)
-                        .addComponent(txtEndDate, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
+                        .addComponent(lblEndDate, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblDescriptionProject)
@@ -244,7 +321,17 @@ public class FrRegisterProject extends javax.swing.JFrame {
                                 .addComponent(btnEdit)
                                 .addGap(18, 18, 18)
                                 .addComponent(btnDelete)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(lblSelectMember)
+                        .addGap(18, 18, 18)
+                        .addComponent(cmbUsers, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnAddMember)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnRemoveMember)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnListMembers)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -260,6 +347,13 @@ public class FrRegisterProject extends javax.swing.JFrame {
                 .addComponent(txtDescriptionProject, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblSelectMember)
+                    .addComponent(cmbUsers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAddMember)
+                    .addComponent(btnRemoveMember)
+                    .addComponent(btnListMembers))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblStartDate)
                     .addComponent(txtStartDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblEndDate)
@@ -269,7 +363,7 @@ public class FrRegisterProject extends javax.swing.JFrame {
                     .addComponent(btnNew)
                     .addComponent(btnEdit)
                     .addComponent(btnDelete))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(16, 16, 16))
         );
 
         tblProjects.setModel(new javax.swing.table.DefaultTableModel(
@@ -277,15 +371,22 @@ public class FrRegisterProject extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID", "Name", "Description", "Start Date", "End Date"
+                "ID", "Name", "Description", "Start Date", "End Date", "Members"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
+                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
+            };
+            boolean[] canEdit = new boolean [] {
+                true, true, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
         });
         tblProjects.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -304,7 +405,7 @@ public class FrRegisterProject extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(scrProjects)
-                    .addComponent(lblTitleProject, javax.swing.GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE)
+                    .addComponent(lblTitleProject, javax.swing.GroupLayout.DEFAULT_SIZE, 657, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnCancel)
@@ -318,13 +419,13 @@ public class FrRegisterProject extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(lblTitleProject, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSave)
                     .addComponent(btnCancel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrProjects, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(scrProjects, javax.swing.GroupLayout.PREFERRED_SIZE, 391, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -342,8 +443,11 @@ public class FrRegisterProject extends javax.swing.JFrame {
             refreshTable();
             clearFields();
             enableFields(false);
-            JOptionPane.showMessageDialog(this,
-                    isNew ? "Project registered successfully." : "Project updated successfully.");
+            if (isNew) {
+                JOptionPane.showMessageDialog(this, "Project registered successfully.");
+            } else {
+                JOptionPane.showMessageDialog(this, "Project updated successfully.");
+            }
         } catch (ValidationException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Validation error", JOptionPane.WARNING_MESSAGE);
@@ -394,7 +498,8 @@ public class FrRegisterProject extends javax.swing.JFrame {
         }
 
         int option = JOptionPane.showConfirmDialog(this,
-                "Delete the project \"" + project.getName() + "\"?",
+                "Delete the project \"" + project.getName() + "\"?\n"
+                + "The users will not be deleted, only removed from this project.",
                 "Confirm deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (option != JOptionPane.YES_OPTION) {
             return;
@@ -420,16 +525,67 @@ public class FrRegisterProject extends javax.swing.JFrame {
         enableFields(false);
     }//GEN-LAST:event_btnCancelActionPerformed
 
+    private void btnAddMemberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddMemberActionPerformed
+        User selected = (User) cmbUsers.getSelectedItem();
+        if (selected == null) {
+            JOptionPane.showMessageDialog(this, "Select a user first.",
+                    "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (selectedMembers.contains(selected)) {
+            JOptionPane.showMessageDialog(this, "This user is already in the project.",
+                    "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        selectedMembers.add(selected);
+        JOptionPane.showMessageDialog(this, selected + " added to the project.");// TODO add your handling code here:
+    }//GEN-LAST:event_btnAddMemberActionPerformed
+
+    private void btnRemoveMemberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveMemberActionPerformed
+        User selected = (User) cmbUsers.getSelectedItem();
+        if (selected == null) {
+            JOptionPane.showMessageDialog(this, "Select a user first.",
+                    "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (selectedMembers.remove(selected)) {
+            JOptionPane.showMessageDialog(this, selected + " removed from the project.");
+        } else {
+            JOptionPane.showMessageDialog(this, "This user is not in the project.",
+                    "Warning", JOptionPane.WARNING_MESSAGE);
+        }// TODO add your handling code here:
+    }//GEN-LAST:event_btnRemoveMemberActionPerformed
+
+    private void btnListMembersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListMembersActionPerformed
+        if (selectedMembers.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No members added yet.");
+            return;
+        }
+
+        StringBuilder text = new StringBuilder("Project members:\n");
+        for (int i = 0; i < selectedMembers.size(); i++) {
+            text.append("- ").append(selectedMembers.get(i)).append("\n");
+        }
+        JOptionPane.showMessageDialog(this, text.toString());// TODO add your handling code here:
+    }//GEN-LAST:event_btnListMembersActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAddMember;
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnEdit;
+    private javax.swing.JButton btnListMembers;
     private javax.swing.JButton btnNew;
+    private javax.swing.JButton btnRemoveMember;
     private javax.swing.JButton btnSave;
+    private javax.swing.JComboBox<User> cmbUsers;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblDescriptionProject;
     private javax.swing.JLabel lblEndDate;
     private javax.swing.JLabel lblNameProject;
+    private javax.swing.JLabel lblSelectMember;
     private javax.swing.JLabel lblStartDate;
     private javax.swing.JLabel lblTitleProject;
     private javax.swing.JScrollPane scrProjects;

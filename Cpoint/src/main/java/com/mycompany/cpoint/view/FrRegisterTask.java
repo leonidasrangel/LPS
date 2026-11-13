@@ -5,35 +5,51 @@
 package com.mycompany.cpoint.view;
 
 import com.mycompany.cpoint.controller.TaskController;
-import com.mycompany.cpoint.exception.ValidationException;
+import com.mycompany.cpoint.controller.UserController;
 import com.mycompany.cpoint.exception.DatabaseException;
-import javax.swing.JOptionPane;
+import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.Task;
+import com.mycompany.cpoint.model.User;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author Rangel
- */
 public class FrRegisterTask extends javax.swing.JFrame {
 
     private Task editingTask;
 
     private final TaskController taskController = new TaskController();
+    private final UserController userController = new UserController();
     private List<Task> tasks = new ArrayList<>();
+    private final List<User> selectedMembers = new ArrayList<>();
 
-    /**
-     * Creates new form FrRegisterTask
-     */
     public FrRegisterTask() {
         initComponents();
         tblTasks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        loadUsers();
         refreshTable();
         clearFields();
         enableFields(false);
+    }
+
+    private void loadUsers() {
+        cmbUsers.removeAllItems();
+
+        List<User> users;
+        try {
+            users = userController.listUsers();
+        } catch (DatabaseException ex) {
+            JOptionPane.showMessageDialog(this, "Error loading users: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        for (int i = 0; i < users.size(); i++) {
+            cmbUsers.addItem(users.get(i));
+        }
     }
 
     private void refreshTable() {
@@ -49,14 +65,27 @@ public class FrRegisterTask extends javax.swing.JFrame {
             return;
         }
 
-        for (Task task : tasks) {
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
             model.addRow(new Object[]{
                 task.getId(),
                 task.getName(),
                 task.getDescription(),
-                task.getState()
+                task.getState(),
+                membersToText(task.getMembers())
             });
         }
+    }
+
+    private String membersToText(Set<User> members) {
+        StringBuilder text = new StringBuilder();
+        for (User member : members) {
+            if (text.length() > 0) {
+                text.append(", ");
+            }
+            text.append(member.getFirstName()).append(" ").append(member.getLastName());
+        }
+        return text.toString();
     }
 
     private Task getSelectedObjectFromGrid() {
@@ -71,6 +100,8 @@ public class FrRegisterTask extends javax.swing.JFrame {
         txtNameTask.setText("");
         txtDescriptionTask.setText("");
         bgState.clearSelection();
+        cmbUsers.setSelectedIndex(-1);
+        selectedMembers.clear();
     }
 
     private void enableFields(boolean enabled) {
@@ -79,6 +110,9 @@ public class FrRegisterTask extends javax.swing.JFrame {
         rdbNotStarted.setEnabled(enabled);
         rdbInProgress.setEnabled(enabled);
         rdbCompleted.setEnabled(enabled);
+        cmbUsers.setEnabled(enabled);
+        btnAddMember.setEnabled(enabled);
+        btnRemoveMember.setEnabled(enabled);
 
         btnSave.setEnabled(enabled);
         btnCancel.setEnabled(enabled);
@@ -103,6 +137,10 @@ public class FrRegisterTask extends javax.swing.JFrame {
         } else {
             bgState.clearSelection();
         }
+
+        cmbUsers.setSelectedIndex(-1);
+        selectedMembers.clear();
+        selectedMembers.addAll(task.getMembers());
     }
 
     private Task fieldsToObject() {
@@ -110,10 +148,28 @@ public class FrRegisterTask extends javax.swing.JFrame {
         String description = txtDescriptionTask.getText();
         String state = getSelectedState();
 
+        Task task;
         if (editingTask == null) {
-            return new Task(name, description, state);
+            task = new Task(name, description, state);
+        } else {
+            task = new Task(editingTask.getId(), name, description, state);
         }
-        return new Task(editingTask.getId(), name, description, state);
+
+        for (int i = 0; i < selectedMembers.size(); i++) {
+            task.addMember(selectedMembers.get(i));
+        }
+        return task;
+    }
+
+    private String getSelectedState() {
+        if (rdbNotStarted.isSelected()) {
+            return rdbNotStarted.getText();
+        } else if (rdbInProgress.isSelected()) {
+            return rdbInProgress.getText();
+        } else if (rdbCompleted.isSelected()) {
+            return rdbCompleted.getText();
+        }
+        return null;
     }
 
     /**
@@ -143,6 +199,11 @@ public class FrRegisterTask extends javax.swing.JFrame {
         btnNew = new javax.swing.JButton();
         btnEdit = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
+        lblSelectMember = new javax.swing.JLabel();
+        cmbUsers = new javax.swing.JComboBox<>();
+        btnAddMember = new javax.swing.JButton();
+        btnRemoveMember = new javax.swing.JButton();
+        btnListMember = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -185,14 +246,14 @@ public class FrRegisterTask extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID", "Name", "Description", "State"
+                "ID", "Name", "Description", "State", "Members"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
+                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -231,6 +292,29 @@ public class FrRegisterTask extends javax.swing.JFrame {
             }
         });
 
+        lblSelectMember.setText("Select Member:");
+
+        btnAddMember.setText("Add Member");
+        btnAddMember.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddMemberActionPerformed(evt);
+            }
+        });
+
+        btnRemoveMember.setText("Remove Member");
+        btnRemoveMember.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveMemberActionPerformed(evt);
+            }
+        });
+
+        btnListMember.setText("List Member");
+        btnListMember.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnListMemberActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -243,32 +327,46 @@ public class FrRegisterTask extends javax.swing.JFrame {
                         .addComponent(lblNameTask)
                         .addGap(18, 18, 18)
                         .addComponent(txtNameTask))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(btnCancel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnSave))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(lblState)
-                                .addGap(18, 18, 18)
-                                .addComponent(rdbNotStarted)
-                                .addGap(18, 18, 18)
-                                .addComponent(rdbInProgress)
-                                .addGap(18, 18, 18)
-                                .addComponent(rdbCompleted))))
-                    .addComponent(scrTasks, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
+                    .addComponent(scrTasks)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblDescriptionTask)
+                        .addComponent(lblDescriptionTask)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(lblSelectMember)
+                                .addGap(18, 18, 18)
+                                .addComponent(cmbUsers, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                 .addComponent(btnNew)
                                 .addGap(18, 18, 18)
                                 .addComponent(btnEdit)
                                 .addGap(18, 18, 18)
                                 .addComponent(btnDelete)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                        .addComponent(btnCancel)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(btnSave))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(lblState)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(rdbNotStarted)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(rdbInProgress)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(rdbCompleted))))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(btnAddMember)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnRemoveMember)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnListMember)
+                                .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -281,22 +379,32 @@ public class FrRegisterTask extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(lblDescriptionTask)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtDescriptionTask, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblState)
-                    .addComponent(rdbNotStarted)
-                    .addComponent(rdbInProgress)
-                    .addComponent(rdbCompleted))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSave)
-                    .addComponent(btnCancel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnNew)
-                    .addComponent(btnEdit)
-                    .addComponent(btnDelete))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(txtDescriptionTask, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblSelectMember)
+                            .addComponent(cmbUsers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnAddMember)
+                            .addComponent(btnRemoveMember)
+                            .addComponent(btnListMember))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 74, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnNew)
+                            .addComponent(btnEdit)
+                            .addComponent(btnDelete)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblState)
+                            .addComponent(rdbNotStarted)
+                            .addComponent(rdbInProgress)
+                            .addComponent(rdbCompleted))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnSave)
+                            .addComponent(btnCancel))))
                 .addGap(18, 18, 18)
                 .addComponent(scrTasks, javax.swing.GroupLayout.PREFERRED_SIZE, 338, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(17, 17, 17))
@@ -335,8 +443,11 @@ public class FrRegisterTask extends javax.swing.JFrame {
             refreshTable();
             clearFields();
             enableFields(false);
-            JOptionPane.showMessageDialog(this,
-                    isNew ? "Task registered successfully." : "Task updated successfully.");
+            if (isNew) {
+                JOptionPane.showMessageDialog(this, "Task registered successfully.");
+            } else {
+                JOptionPane.showMessageDialog(this, "Task updated successfully.");
+            }
         } catch (ValidationException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Validation error", JOptionPane.WARNING_MESSAGE);
@@ -386,7 +497,8 @@ public class FrRegisterTask extends javax.swing.JFrame {
         }
 
         int option = JOptionPane.showConfirmDialog(this,
-                "Delete the task \"" + task.getName() + "\"?",
+                "Delete the task \"" + task.getName() + "\"?\n"
+                + "The users will not be deleted, only removed from this task.",
                 "Confirm deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (option != JOptionPane.YES_OPTION) {
             return;
@@ -412,30 +524,71 @@ public class FrRegisterTask extends javax.swing.JFrame {
         enableFields(false);
     }//GEN-LAST:event_btnCancelActionPerformed
 
+    private void btnAddMemberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddMemberActionPerformed
+        User selected = (User) cmbUsers.getSelectedItem();
+        if (selected == null) {
+            JOptionPane.showMessageDialog(this, "Select a user first.",
+                    "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (selectedMembers.contains(selected)) {
+            JOptionPane.showMessageDialog(this, "This user is already in the task.",
+                    "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        selectedMembers.add(selected);
+        JOptionPane.showMessageDialog(this, selected + " added to the task.");// TODO add your handling code here:
+    }//GEN-LAST:event_btnAddMemberActionPerformed
+
+    private void btnRemoveMemberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveMemberActionPerformed
+        User selected = (User) cmbUsers.getSelectedItem();
+        if (selected == null) {
+            JOptionPane.showMessageDialog(this, "Select a user first.",
+                    "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (selectedMembers.remove(selected)) {
+            JOptionPane.showMessageDialog(this, selected + " removed from the task.");
+        } else {
+            JOptionPane.showMessageDialog(this, "This user is not in the task.",
+                    "Warning", JOptionPane.WARNING_MESSAGE);
+        }// TODO add your handling code here:
+    }//GEN-LAST:event_btnRemoveMemberActionPerformed
+
+    private void btnListMemberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListMemberActionPerformed
+        if (selectedMembers.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No members added yet.");
+            return;
+        }
+
+        StringBuilder text = new StringBuilder("Task members:\n");
+        for (int i = 0; i < selectedMembers.size(); i++) {
+            text.append("- ").append(selectedMembers.get(i)).append("\n");
+        }
+        JOptionPane.showMessageDialog(this, text.toString());// TODO add your handling code here:
+    }//GEN-LAST:event_btnListMemberActionPerformed
+
     /**
      * @param args the command line arguments
      */
-    private String getSelectedState() {
-        if (rdbNotStarted.isSelected()) {
-            return rdbNotStarted.getText();
-        } else if (rdbInProgress.isSelected()) {
-            return rdbInProgress.getText();
-        } else if (rdbCompleted.isSelected()) {
-            return rdbCompleted.getText();
-        }
-        return null;
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgState;
+    private javax.swing.JButton btnAddMember;
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnEdit;
+    private javax.swing.JButton btnListMember;
     private javax.swing.JButton btnNew;
+    private javax.swing.JButton btnRemoveMember;
     private javax.swing.JButton btnSave;
+    private javax.swing.JComboBox<User> cmbUsers;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblDescriptionTask;
     private javax.swing.JLabel lblNameTask;
+    private javax.swing.JLabel lblSelectMember;
     private javax.swing.JLabel lblState;
     private javax.swing.JLabel lblTitleTask;
     private javax.swing.JRadioButton rdbCompleted;
