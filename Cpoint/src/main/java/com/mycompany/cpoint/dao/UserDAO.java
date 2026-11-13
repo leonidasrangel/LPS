@@ -33,6 +33,10 @@ public class UserDAO extends BaseDAO {
             = "SELECT COUNT(u) FROM User u WHERE u.username = :value AND u.id <> :ignoredId";
     private static final String TEAM_MEMBER_COUNT_JPQL
             = "SELECT COUNT(t) FROM Team t JOIN t.members m WHERE m.id = :userId";
+    private static final String TASK_MEMBER_COUNT_JPQL
+            = "SELECT COUNT(t) FROM Task t JOIN t.members m WHERE m.id = :userId";
+    private static final String PROJECT_MEMBER_COUNT_JPQL
+            = "SELECT COUNT(p) FROM Project p JOIN p.members m WHERE m.id = :userId";
 
     public void insert(User user) throws DatabaseException {
         EntityManager em = null;
@@ -138,18 +142,18 @@ public class UserDAO extends BaseDAO {
     }
 
     public boolean isTeamMember(int userId) throws DatabaseException {
-        EntityManager em = null;
-        try {
-            em = JPAUtil.getEntityManager();
-            TypedQuery<Long> query = em.createQuery(TEAM_MEMBER_COUNT_JPQL, Long.class);
-            query.setParameter("userId", userId);
-            long total = query.getSingleResult();
-            return total > 0;
-        } catch (PersistenceException ex) {
-            throw databaseError("Could not check the user's teams.", ex);
-        } finally {
-            closeEntityManager(em);
-        }
+        long total = countByUser(TEAM_MEMBER_COUNT_JPQL, userId, "Could not check the user's teams.");
+        return total > 0;
+    }
+
+    public boolean isTaskMember(int userId) throws DatabaseException {
+        long total = countByUser(TASK_MEMBER_COUNT_JPQL, userId, "Could not check the user's tasks.");
+        return total > 0;
+    }
+
+    public boolean isProjectMember(int userId) throws DatabaseException {
+        long total = countByUser(PROJECT_MEMBER_COUNT_JPQL, userId, "Could not check the user's projects.");
+        return total > 0;
     }
 
     private User findOne(String jpql, String value, String errorMessage) throws DatabaseException {
@@ -179,6 +183,20 @@ public class UserDAO extends BaseDAO {
             TypedQuery<Long> query = em.createQuery(jpql, Long.class);
             query.setParameter("value", value);
             query.setParameter("ignoredId", ignoredId);
+            return query.getSingleResult();
+        } catch (PersistenceException ex) {
+            throw databaseError(errorMessage, ex);
+        } finally {
+            closeEntityManager(em);
+        }
+    }
+
+    private long countByUser(String jpql, int userId, String errorMessage) throws DatabaseException {
+        EntityManager em = null;
+        try {
+            em = JPAUtil.getEntityManager();
+            TypedQuery<Long> query = em.createQuery(jpql, Long.class);
+            query.setParameter("userId", userId);
             return query.getSingleResult();
         } catch (PersistenceException ex) {
             throw databaseError(errorMessage, ex);

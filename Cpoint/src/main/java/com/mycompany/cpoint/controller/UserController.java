@@ -42,13 +42,7 @@ public class UserController {
 
     public void deleteUser(int id) throws ValidationException, DatabaseException {
         userValidator.validateId(id);
-
-        if (userDAO.isTeamMember(id)) {
-            throw new ValidationException(List.of(
-                    "This user is a member of a team and cannot be deleted. "
-                    + "Remove them from the team first."));
-        }
-
+        checkParticipation(id);
         userDAO.delete(id);
     }
 
@@ -85,6 +79,25 @@ public class UserController {
         }
 
         if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
+    }
+
+    private void checkParticipation(int id) throws ValidationException, DatabaseException {
+        List<String> errors = new ArrayList<>();
+
+        if (userDAO.isTeamMember(id)) {
+            errors.add("- They are a member of a team. Remove them from the team first.");
+        }
+        if (userDAO.isTaskMember(id)) {
+            errors.add("- They participate in a task. Remove them from the task first.");
+        }
+        if (userDAO.isProjectMember(id)) {
+            errors.add("- They participate in a project. Remove them from the project first.");
+        }
+
+        if (!errors.isEmpty()) {
+            errors.add(0, "This user cannot be deleted:");
             throw new ValidationException(errors);
         }
     }

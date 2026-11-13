@@ -20,7 +20,7 @@ import java.util.List;
 public class ProjectDAO extends BaseDAO {
 
     private static final String FIND_ALL_JPQL
-            = "SELECT p FROM Project p ORDER BY p.id";
+            = "SELECT p FROM Project p LEFT JOIN FETCH p.members ORDER BY p.id";
 
     public void insert(Project project) throws DatabaseException {
         EntityManager em = null;

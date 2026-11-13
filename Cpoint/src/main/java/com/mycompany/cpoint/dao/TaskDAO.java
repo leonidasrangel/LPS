@@ -20,7 +20,7 @@ import java.util.List;
 public class TaskDAO extends BaseDAO {
 
     private static final String FIND_ALL_JPQL
-            = "SELECT t FROM Task t ORDER BY t.id";
+            = "SELECT t FROM Task t LEFT JOIN FETCH t.members ORDER BY t.id";
 
     public void insert(Task task) throws DatabaseException {
         EntityManager em = null;

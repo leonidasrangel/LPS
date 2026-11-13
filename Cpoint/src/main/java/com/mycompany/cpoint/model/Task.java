@@ -13,7 +13,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "tasks")
@@ -31,6 +37,15 @@ public class Task {
 
     @Column(nullable = false)
     private String state;
+
+    @ManyToMany
+    @JoinTable(
+            name = "task_members",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @OrderBy("firstName ASC, lastName ASC")
+    private Set<User> members = new LinkedHashSet<>();
 
     protected Task() {
         // Required by JPA
@@ -73,6 +88,18 @@ public class Task {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public Set<User> getMembers() {
+        return members;
+    }
+
+    public void addMember(User user) {
+        members.add(user);
+    }
+
+    public void removeMember(User user) {
+        members.remove(user);
     }
 
     @Override
