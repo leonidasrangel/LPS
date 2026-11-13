@@ -538,11 +538,17 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="View Projects"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnViewProjectsActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnViewTasks">
               <Properties>
                 <Property name="text" type="java.lang.String" value="View Tasks"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnViewTasksActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnSignOut">
               <Properties>

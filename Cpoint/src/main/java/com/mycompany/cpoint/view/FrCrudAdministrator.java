@@ -5,7 +5,6 @@
 package com.mycompany.cpoint.view;
 
 import com.mycompany.cpoint.controller.AuthController;
-import java.util.function.Supplier;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -17,27 +16,33 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
     private JFrame taskScreen;
     private JFrame projectScreen;
     private JFrame teamScreen;
+    private JFrame viewTasksScreen;
+    private JFrame viewProjectsScreen;
 
     public FrCrudAdministrator() {
         initComponents();
         setLocationRelativeTo(null);
     }
 
-    private JFrame openScreen(JFrame screen, Supplier<JFrame> createScreen) {
-        if (screen == null || !screen.isDisplayable()) {
-            screen = createScreen.get();
-            screen.setLocationRelativeTo(this);
+    private boolean isClosed(JFrame screen) {
+        if (screen == null) {
+            return true;
         }
+        return !screen.isDisplayable();
+    }
+
+    private void showScreen(JFrame screen) {
         screen.setVisible(true);
         screen.toFront();
-        return screen;
     }
 
     private void closeOpenScreens() {
-        JFrame[] screens = {userScreen, taskScreen, projectScreen, teamScreen};
-        for (JFrame screen : screens) {
-            if (screen != null) {
-                screen.dispose();
+        JFrame[] screens = {userScreen, taskScreen, projectScreen, teamScreen,
+            viewTasksScreen, viewProjectsScreen};
+
+        for (int i = 0; i < screens.length; i++) {
+            if (screens[i] != null) {
+                screens[i].dispose();
             }
         }
     }
@@ -313,8 +318,18 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         });
 
         btnViewProjects.setText("View Projects");
+        btnViewProjects.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnViewProjectsActionPerformed(evt);
+            }
+        });
 
         btnViewTasks.setText("View Tasks");
+        btnViewTasks.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnViewTasksActionPerformed(evt);
+            }
+        });
 
         btnSignOut.setText("Sign out");
         btnSignOut.addActionListener(new java.awt.event.ActionListener() {
@@ -423,20 +438,54 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSignOutActionPerformed
 
     private void btnRegisterUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterUserActionPerformed
-        userScreen = openScreen(userScreen, FrRegisterUser::new);
+        if (isClosed(userScreen)) {
+            userScreen = new FrRegisterUser();
+            userScreen.setLocationRelativeTo(this);
+        }
+        showScreen(userScreen);
     }//GEN-LAST:event_btnRegisterUserActionPerformed
 
     private void btnRegisterTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterTaskActionPerformed
-        taskScreen = openScreen(taskScreen, FrRegisterTask::new);
+        if (isClosed(taskScreen)) {
+            taskScreen = new FrRegisterTask();
+            taskScreen.setLocationRelativeTo(this);
+        }
+        showScreen(taskScreen);
     }//GEN-LAST:event_btnRegisterTaskActionPerformed
 
     private void btnRegisterProjectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterProjectActionPerformed
-        projectScreen = openScreen(projectScreen, FrRegisterProject::new);
+        if (isClosed(projectScreen)) {
+            projectScreen = new FrRegisterProject();
+            projectScreen.setLocationRelativeTo(this);
+        }
+        showScreen(projectScreen);
     }//GEN-LAST:event_btnRegisterProjectActionPerformed
 
     private void btnRegisterTeamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterTeamActionPerformed
-        teamScreen = openScreen(teamScreen, FrRegisterTeam::new);
+        if (isClosed(teamScreen)) {
+            teamScreen = new FrRegisterTeam();
+            teamScreen.setLocationRelativeTo(this);
+        }
+        showScreen(teamScreen);
     }//GEN-LAST:event_btnRegisterTeamActionPerformed
+
+    private void btnViewTasksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewTasksActionPerformed
+        if (isClosed(viewTasksScreen)) {
+            viewTasksScreen = new FrViewTasks();
+            viewTasksScreen.setLocationRelativeTo(this);
+        }
+        showScreen(viewTasksScreen);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnViewTasksActionPerformed
+
+    private void btnViewProjectsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewProjectsActionPerformed
+        if (isClosed(viewProjectsScreen)) {
+            viewProjectsScreen = new FrViewProjects();
+            viewProjectsScreen.setLocationRelativeTo(this);
+        }
+        showScreen(viewProjectsScreen);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnViewProjectsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDashboard;

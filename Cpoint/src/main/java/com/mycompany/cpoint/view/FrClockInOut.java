@@ -7,11 +7,15 @@ package com.mycompany.cpoint.view;
 import com.mycompany.cpoint.controller.AuthController;
 import com.mycompany.cpoint.model.User;
 import com.mycompany.cpoint.util.UserSession;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class FrClockInOut extends javax.swing.JFrame {
 
     private final AuthController authController = new AuthController();
+
+    private JFrame viewTasksScreen;
+    private JFrame viewProjectsScreen;
 
     public FrClockInOut() {
         initComponents();
@@ -23,6 +27,28 @@ public class FrClockInOut extends javax.swing.JFrame {
         User user = UserSession.getCurrentUser();
         lblNameUser.setText(user.getFirstName() + " " + user.getLastName());
         lblDepartamentUser.setText(user.getDepartment());
+    }
+
+    private boolean isClosed(JFrame screen) {
+        if (screen == null) {
+            return true;
+        }
+        return !screen.isDisplayable();
+    }
+
+    private void showScreen(JFrame screen) {
+        screen.setVisible(true);
+        screen.toFront();
+    }
+
+    private void closeOpenScreens() {
+        JFrame[] screens = {viewTasksScreen, viewProjectsScreen};
+
+        for (int i = 0; i < screens.length; i++) {
+            if (screens[i] != null) {
+                screens[i].dispose();
+            }
+        }
     }
 
     /**
@@ -43,6 +69,8 @@ public class FrClockInOut extends javax.swing.JFrame {
         lblDate = new javax.swing.JLabel();
         lblHour = new javax.swing.JLabel();
         btnSignOut = new javax.swing.JButton();
+        btnViewTasks = new javax.swing.JButton();
+        bntViewProjects = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -71,6 +99,20 @@ public class FrClockInOut extends javax.swing.JFrame {
             }
         });
 
+        btnViewTasks.setText("View Tasks");
+        btnViewTasks.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnViewTasksActionPerformed(evt);
+            }
+        });
+
+        bntViewProjects.setText("View Projects");
+        bntViewProjects.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bntViewProjectsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlClockInOutLayout = new javax.swing.GroupLayout(pnlClockInOut);
         pnlClockInOut.setLayout(pnlClockInOutLayout);
         pnlClockInOutLayout.setHorizontalGroup(
@@ -96,8 +138,12 @@ public class FrClockInOut extends javax.swing.JFrame {
                             .addComponent(lblHour))
                         .addGap(0, 129, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlClockInOutLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(pnlClockInOutLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnViewTasks, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bntViewProjects))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnSignOut))
         );
         pnlClockInOutLayout.setVerticalGroup(
@@ -112,14 +158,18 @@ public class FrClockInOut extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblDepartamentUser))
                     .addComponent(lblIconUser))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 84, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 121, Short.MAX_VALUE)
                 .addComponent(lblDate)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblHour)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnClockInOut, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(65, 65, 65)
-                .addComponent(btnSignOut)
+                .addGap(31, 31, 31)
+                .addComponent(btnViewTasks)
+                .addGap(11, 11, 11)
+                .addGroup(pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSignOut)
+                    .addComponent(bntViewProjects))
                 .addContainerGap())
         );
 
@@ -151,13 +201,32 @@ public class FrClockInOut extends javax.swing.JFrame {
         }
 
         authController.logout();
+        closeOpenScreens();
         new FrLogin().setVisible(true);
         dispose();
     }//GEN-LAST:event_btnSignOutActionPerformed
 
+    private void btnViewTasksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewTasksActionPerformed
+        if (isClosed(viewTasksScreen)) {
+            viewTasksScreen = new FrViewTasks();
+            viewTasksScreen.setLocationRelativeTo(this);
+        }
+        showScreen(viewTasksScreen);
+    }//GEN-LAST:event_btnViewTasksActionPerformed
+
+    private void bntViewProjectsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bntViewProjectsActionPerformed
+        if (isClosed(viewProjectsScreen)) {
+            viewProjectsScreen = new FrViewProjects();
+            viewProjectsScreen.setLocationRelativeTo(this);
+        }
+        showScreen(viewProjectsScreen);
+    }//GEN-LAST:event_bntViewProjectsActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bntViewProjects;
     private javax.swing.JButton btnClockInOut;
     private javax.swing.JButton btnSignOut;
+    private javax.swing.JButton btnViewTasks;
     private javax.swing.JLabel lblDate;
     private javax.swing.JLabel lblDepartamentUser;
     private javax.swing.JLabel lblHour;
