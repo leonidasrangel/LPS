@@ -22,6 +22,11 @@ public class ProjectDAO extends BaseDAO {
     private static final String FIND_ALL_JPQL
             = "SELECT p FROM Project p LEFT JOIN FETCH p.members ORDER BY p.id";
 
+    private static final String FIND_BY_MEMBER_JPQL
+            = "SELECT p FROM Project p LEFT JOIN FETCH p.members "
+            + "WHERE p.id IN (SELECT p2.id FROM Project p2 JOIN p2.members m WHERE m.id = :userId) "
+            + "ORDER BY p.id";
+
     public void insert(Project project) throws DatabaseException {
         EntityManager em = null;
         try {
@@ -47,6 +52,20 @@ public class ProjectDAO extends BaseDAO {
             return query.getResultList();
         } catch (PersistenceException ex) {
             throw databaseError("Could not load the projects.", ex);
+        } finally {
+            closeEntityManager(em);
+        }
+    }
+
+    public List<Project> findByMember(int userId) throws DatabaseException {
+        EntityManager em = null;
+        try {
+            em = JPAUtil.getEntityManager();
+            TypedQuery<Project> query = em.createQuery(FIND_BY_MEMBER_JPQL, Project.class);
+            query.setParameter("userId", userId);
+            return query.getResultList();
+        } catch (PersistenceException ex) {
+            throw databaseError("Could not load the user's projects.", ex);
         } finally {
             closeEntityManager(em);
         }

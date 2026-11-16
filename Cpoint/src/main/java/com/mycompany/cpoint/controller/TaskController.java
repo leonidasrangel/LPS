@@ -11,7 +11,9 @@ package com.mycompany.cpoint.controller;
 import com.mycompany.cpoint.dao.TaskDAO;
 import com.mycompany.cpoint.exception.DatabaseException;
 import com.mycompany.cpoint.exception.ValidationException;
+import com.mycompany.cpoint.model.Role;
 import com.mycompany.cpoint.model.Task;
+import com.mycompany.cpoint.model.User;
 import com.mycompany.cpoint.validation.TaskValidator;
 import java.util.List;
 
@@ -37,5 +39,12 @@ public class TaskController {
 
     public List<Task> listTasks() throws DatabaseException {
         return taskDAO.findAll();
+    }
+
+    public List<Task> listTasksForUser(User user) throws DatabaseException {
+        if (user.getRole() == Role.ADMIN) {
+            return taskDAO.findAll();
+        }
+        return taskDAO.findByMember(user.getId());
     }
 }

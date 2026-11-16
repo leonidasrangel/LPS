@@ -11,9 +11,12 @@ package com.mycompany.cpoint.view;
 import com.mycompany.cpoint.controller.ProjectController;
 import com.mycompany.cpoint.exception.DatabaseException;
 import com.mycompany.cpoint.model.Project;
+import com.mycompany.cpoint.model.User;
+import com.mycompany.cpoint.util.UserSession;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -25,6 +28,9 @@ public class FrViewProjects extends javax.swing.JFrame {
 
     public FrViewProjects() {
         initComponents();
+        if (!UserSession.isAdmin()) {
+            lblTitleViewProjects.setText("My Projects");
+        }
         refreshTable();
     }
 
@@ -34,7 +40,7 @@ public class FrViewProjects extends javax.swing.JFrame {
 
         List<Project> projects;
         try {
-            projects = projectController.listProjects();
+            projects = projectController.listProjectsForUser(UserSession.getCurrentUser());
         } catch (DatabaseException ex) {
             JOptionPane.showMessageDialog(this, "Error loading projects: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -48,7 +54,8 @@ public class FrViewProjects extends javax.swing.JFrame {
                 project.getName(),
                 project.getDescription(),
                 formatDate(project.getStartDate()),
-                formatDate(project.getEndDate())
+                formatDate(project.getEndDate()),
+                membersToText(project.getMembers())
             });
         }
     }
@@ -58,6 +65,17 @@ public class FrViewProjects extends javax.swing.JFrame {
             return "";
         }
         return date.format(DATE_FORMAT);
+    }
+
+    private String membersToText(Set<User> members) {
+        StringBuilder text = new StringBuilder();
+        for (User member : members) {
+            if (text.length() > 0) {
+                text.append(", ");
+            }
+            text.append(member.getFirstName()).append(" ").append(member.getLastName());
+        }
+        return text.toString();
     }
 
     /**
@@ -84,14 +102,14 @@ public class FrViewProjects extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID", "Name", "Description", "Start"
+                "ID", "Name", "Description", "Start Date", "End Date", "Members"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
+                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -113,7 +131,7 @@ public class FrViewProjects extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblTitleViewProjects, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(scrProjects, javax.swing.GroupLayout.DEFAULT_SIZE, 603, Short.MAX_VALUE)
+                        .addComponent(scrProjects, javax.swing.GroupLayout.DEFAULT_SIZE, 781, Short.MAX_VALUE)
                         .addContainerGap())))
         );
         layout.setVerticalGroup(

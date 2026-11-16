@@ -9,10 +9,12 @@ package com.mycompany.cpoint.controller;
  * @author Rangel
  */
 import com.mycompany.cpoint.dao.ProjectDAO;
+import com.mycompany.cpoint.exception.DatabaseException;
 import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.Project;
+import com.mycompany.cpoint.model.Role;
+import com.mycompany.cpoint.model.User;
 import com.mycompany.cpoint.validation.ProjectValidator;
-import com.mycompany.cpoint.exception.DatabaseException;
 import java.util.List;
 
 public class ProjectController {
@@ -37,5 +39,12 @@ public class ProjectController {
 
     public List<Project> listProjects() throws DatabaseException {
         return projectDAO.findAll();
+    }
+
+    public List<Project> listProjectsForUser(User user) throws DatabaseException {
+        if (user.getRole() == Role.ADMIN) {
+            return projectDAO.findAll();
+        }
+        return projectDAO.findByMember(user.getId());
     }
 }

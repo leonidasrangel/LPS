@@ -22,6 +22,11 @@ public class TaskDAO extends BaseDAO {
     private static final String FIND_ALL_JPQL
             = "SELECT t FROM Task t LEFT JOIN FETCH t.members ORDER BY t.id";
 
+    private static final String FIND_BY_MEMBER_JPQL
+            = "SELECT t FROM Task t LEFT JOIN FETCH t.members "
+            + "WHERE t.id IN (SELECT t2.id FROM Task t2 JOIN t2.members m WHERE m.id = :userId) "
+            + "ORDER BY t.id";
+
     public void insert(Task task) throws DatabaseException {
         EntityManager em = null;
         try {
@@ -47,6 +52,20 @@ public class TaskDAO extends BaseDAO {
             return query.getResultList();
         } catch (PersistenceException ex) {
             throw databaseError("Could not load the tasks.", ex);
+        } finally {
+            closeEntityManager(em);
+        }
+    }
+
+    public List<Task> findByMember(int userId) throws DatabaseException {
+        EntityManager em = null;
+        try {
+            em = JPAUtil.getEntityManager();
+            TypedQuery<Task> query = em.createQuery(FIND_BY_MEMBER_JPQL, Task.class);
+            query.setParameter("userId", userId);
+            return query.getResultList();
+        } catch (PersistenceException ex) {
+            throw databaseError("Could not load the user's tasks.", ex);
         } finally {
             closeEntityManager(em);
         }

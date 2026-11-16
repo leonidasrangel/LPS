@@ -11,7 +11,10 @@ package com.mycompany.cpoint.view;
 import com.mycompany.cpoint.controller.TaskController;
 import com.mycompany.cpoint.exception.DatabaseException;
 import com.mycompany.cpoint.model.Task;
+import com.mycompany.cpoint.model.User;
+import com.mycompany.cpoint.util.UserSession;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -21,6 +24,9 @@ public class FrViewTasks extends javax.swing.JFrame {
 
     public FrViewTasks() {
         initComponents();
+        if (!UserSession.isAdmin()) {
+            lblTitleViewTasks.setText("My Tasks");
+        }
         refreshTable();
     }
 
@@ -30,7 +36,7 @@ public class FrViewTasks extends javax.swing.JFrame {
 
         List<Task> tasks;
         try {
-            tasks = taskController.listTasks();
+            tasks = taskController.listTasksForUser(UserSession.getCurrentUser());
         } catch (DatabaseException ex) {
             JOptionPane.showMessageDialog(this, "Error loading tasks: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -43,9 +49,21 @@ public class FrViewTasks extends javax.swing.JFrame {
                 task.getId(),
                 task.getName(),
                 task.getDescription(),
-                task.getState()
+                task.getState(),
+                membersToText(task.getMembers())
             });
         }
+    }
+
+    private String membersToText(Set<User> members) {
+        StringBuilder text = new StringBuilder();
+        for (User member : members) {
+            if (text.length() > 0) {
+                text.append(", ");
+            }
+            text.append(member.getFirstName()).append(" ").append(member.getLastName());
+        }
+        return text.toString();
     }
 
     /**
@@ -72,14 +90,14 @@ public class FrViewTasks extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID", "Name", "Description", "State"
+                "ID", "Name", "Description", "State", "Members"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
+                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -100,7 +118,7 @@ public class FrViewTasks extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblTitleViewTasks, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(scrTasks, javax.swing.GroupLayout.DEFAULT_SIZE, 671, Short.MAX_VALUE))
+                    .addComponent(scrTasks, javax.swing.GroupLayout.DEFAULT_SIZE, 784, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
