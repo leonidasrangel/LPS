@@ -12,6 +12,7 @@
         <class>com.mycompany.cpoint.model.Project</class>
         <class>com.mycompany.cpoint.model.User</class>
         <class>com.mycompany.cpoint.model.Team</class>
+        <class>com.mycompany.cpoint.model.TimeRecord</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 

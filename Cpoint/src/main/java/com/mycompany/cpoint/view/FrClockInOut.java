@@ -5,21 +5,38 @@
 package com.mycompany.cpoint.view;
 
 import com.mycompany.cpoint.controller.AuthController;
+import com.mycompany.cpoint.controller.TimeRecordController;
+import com.mycompany.cpoint.exception.DatabaseException;
+import com.mycompany.cpoint.model.TimeRecord;
 import com.mycompany.cpoint.model.User;
 import com.mycompany.cpoint.util.UserSession;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 
 public class FrClockInOut extends javax.swing.JFrame {
 
+    private static final DateTimeFormatter DAY_FORMAT
+            = DateTimeFormatter.ofPattern("EEEE - dd/MM/yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
+
     private final AuthController authController = new AuthController();
+    private final TimeRecordController timeRecordController = new TimeRecordController();
 
     private JFrame viewTasksScreen;
     private JFrame viewProjectsScreen;
+    private Timer clockTimer;
 
     public FrClockInOut() {
         initComponents();
         showCurrentUser();
+        startClock();
         setLocationRelativeTo(null);
     }
 
@@ -27,6 +44,32 @@ public class FrClockInOut extends javax.swing.JFrame {
         User user = UserSession.getCurrentUser();
         lblNameUser.setText(user.getFirstName() + " " + user.getLastName());
         lblDepartamentUser.setText(user.getDepartment());
+    }
+
+    private void startClock() {
+        updateDateTime();
+
+        clockTimer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                updateDateTime();
+            }
+        });
+        clockTimer.start();
+    }
+
+    private void updateDateTime() {
+        LocalDateTime now = LocalDateTime.now();
+        lblDate.setText(now.format(DAY_FORMAT));
+        lblHour.setText(now.format(TIME_FORMAT));
+    }
+
+    @Override
+    public void dispose() {
+        if (clockTimer != null) {
+            clockTimer.stop();
+        }
+        super.dispose();
     }
 
     private boolean isClosed(JFrame screen) {
@@ -70,7 +113,7 @@ public class FrClockInOut extends javax.swing.JFrame {
         lblHour = new javax.swing.JLabel();
         btnSignOut = new javax.swing.JButton();
         btnViewTasks = new javax.swing.JButton();
-        bntViewProjects = new javax.swing.JButton();
+        btnViewProjects = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -86,11 +129,16 @@ public class FrClockInOut extends javax.swing.JFrame {
         lblTittleClockInOut.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         btnClockInOut.setText("Clock In / Out");
+        btnClockInOut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClockInOutActionPerformed(evt);
+            }
+        });
 
-        lblDate.setText("Monday - 09/22/2026");
+        lblDate.setText("Wednesday - 30/09/2026");
 
         lblHour.setFont(new java.awt.Font("Calibri", 0, 48)); // NOI18N
-        lblHour.setText("10:20");
+        lblHour.setText("00:00:00");
 
         btnSignOut.setText("Sign out");
         btnSignOut.addActionListener(new java.awt.event.ActionListener() {
@@ -106,10 +154,10 @@ public class FrClockInOut extends javax.swing.JFrame {
             }
         });
 
-        bntViewProjects.setText("View Projects");
-        bntViewProjects.addActionListener(new java.awt.event.ActionListener() {
+        btnViewProjects.setText("View Projects");
+        btnViewProjects.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bntViewProjectsActionPerformed(evt);
+                btnViewProjectsActionPerformed(evt);
             }
         });
 
@@ -117,10 +165,18 @@ public class FrClockInOut extends javax.swing.JFrame {
         pnlClockInOut.setLayout(pnlClockInOutLayout);
         pnlClockInOutLayout.setHorizontalGroup(
             pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlClockInOutLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(lblDate)
+                .addGap(128, 128, 128))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlClockInOutLayout.createSequentialGroup()
+                .addContainerGap(110, Short.MAX_VALUE)
+                .addComponent(lblHour)
+                .addGap(108, 108, 108))
             .addGroup(pnlClockInOutLayout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlClockInOutLayout.createSequentialGroup()
-                        .addContainerGap()
+                    .addGroup(pnlClockInOutLayout.createSequentialGroup()
                         .addGroup(pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(btnClockInOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lblTittleClockInOut, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -130,21 +186,14 @@ public class FrClockInOut extends javax.swing.JFrame {
                                 .addGroup(pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lblNameUser)
                                     .addComponent(lblDepartamentUser))
-                                .addGap(0, 0, Short.MAX_VALUE))))
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())
                     .addGroup(pnlClockInOutLayout.createSequentialGroup()
-                        .addGap(140, 140, 140)
-                        .addGroup(pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblDate)
-                            .addComponent(lblHour))
-                        .addGap(0, 129, Short.MAX_VALUE)))
-                .addContainerGap())
-            .addGroup(pnlClockInOutLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btnViewTasks, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(bntViewProjects))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnSignOut))
+                        .addGroup(pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnViewTasks, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnViewProjects, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnSignOut))))
         );
         pnlClockInOutLayout.setVerticalGroup(
             pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -164,12 +213,12 @@ public class FrClockInOut extends javax.swing.JFrame {
                 .addComponent(lblHour)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnClockInOut, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(31, 31, 31)
+                .addGap(30, 30, 30)
                 .addComponent(btnViewTasks)
-                .addGap(11, 11, 11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSignOut)
-                    .addComponent(bntViewProjects))
+                    .addComponent(btnViewProjects))
                 .addContainerGap())
         );
 
@@ -214,18 +263,36 @@ public class FrClockInOut extends javax.swing.JFrame {
         showScreen(viewTasksScreen);
     }//GEN-LAST:event_btnViewTasksActionPerformed
 
-    private void bntViewProjectsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bntViewProjectsActionPerformed
+    private void btnViewProjectsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewProjectsActionPerformed
         if (isClosed(viewProjectsScreen)) {
             viewProjectsScreen = new FrViewProjects();
             viewProjectsScreen.setLocationRelativeTo(this);
         }
         showScreen(viewProjectsScreen);
-    }//GEN-LAST:event_bntViewProjectsActionPerformed
+    }//GEN-LAST:event_btnViewProjectsActionPerformed
+
+    private void btnClockInOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClockInOutActionPerformed
+        TimeRecord record;
+        try {
+            record = timeRecordController.registerPunch(UserSession.getCurrentUser());
+        } catch (DatabaseException ex) {
+            JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        LocalDateTime recordedAt = record.getRecordedAt();
+        JOptionPane.showMessageDialog(this,
+                record.getType() + " recorded successfully.\n"
+                + "Date: " + recordedAt.format(DATE_FORMAT) + "\n"
+                + "Time: " + recordedAt.format(TIME_FORMAT),
+                "Punch recorded", JOptionPane.INFORMATION_MESSAGE);// TODO add your handling code here:
+    }//GEN-LAST:event_btnClockInOutActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton bntViewProjects;
     private javax.swing.JButton btnClockInOut;
     private javax.swing.JButton btnSignOut;
+    private javax.swing.JButton btnViewProjects;
     private javax.swing.JButton btnViewTasks;
     private javax.swing.JLabel lblDate;
     private javax.swing.JLabel lblDepartamentUser;
