@@ -15,13 +15,18 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class TimeRecordDAO extends BaseDAO {
 
-    private static final String FIND_LAST_BY_USER_JPQL
+    private static final String FIND_BY_USER_JPQL
             = "SELECT r FROM TimeRecord r WHERE r.user.id = :userId "
             + "ORDER BY r.recordedAt DESC, r.id DESC";
+    private static final String FIND_BY_USER_IN_PERIOD_JPQL
+            = "SELECT r FROM TimeRecord r "
+            + "WHERE r.user.id = :userId AND r.recordedAt >= :start AND r.recordedAt < :end "
+            + "ORDER BY r.recordedAt ASC, r.id ASC";
 
     public void insert(TimeRecord record) throws DatabaseException {
         EntityManager em = null;
@@ -44,7 +49,7 @@ public class TimeRecordDAO extends BaseDAO {
         EntityManager em = null;
         try {
             em = JPAUtil.getEntityManager();
-            TypedQuery<TimeRecord> query = em.createQuery(FIND_LAST_BY_USER_JPQL, TimeRecord.class);
+            TypedQuery<TimeRecord> query = em.createQuery(FIND_BY_USER_JPQL, TimeRecord.class);
             query.setParameter("userId", userId);
             query.setMaxResults(1);
             List<TimeRecord> found = query.getResultList();
@@ -55,6 +60,37 @@ public class TimeRecordDAO extends BaseDAO {
             return found.get(0);
         } catch (PersistenceException ex) {
             throw databaseError("Could not load the last clock record.", ex);
+        } finally {
+            closeEntityManager(em);
+        }
+    }
+
+    public List<TimeRecord> findByUser(int userId) throws DatabaseException {
+        EntityManager em = null;
+        try {
+            em = JPAUtil.getEntityManager();
+            TypedQuery<TimeRecord> query = em.createQuery(FIND_BY_USER_JPQL, TimeRecord.class);
+            query.setParameter("userId", userId);
+            return query.getResultList();
+        } catch (PersistenceException ex) {
+            throw databaseError("Could not load the clock records.", ex);
+        } finally {
+            closeEntityManager(em);
+        }
+    }
+
+    public List<TimeRecord> findByUserInPeriod(int userId, LocalDateTime start, LocalDateTime end)
+            throws DatabaseException {
+        EntityManager em = null;
+        try {
+            em = JPAUtil.getEntityManager();
+            TypedQuery<TimeRecord> query = em.createQuery(FIND_BY_USER_IN_PERIOD_JPQL, TimeRecord.class);
+            query.setParameter("userId", userId);
+            query.setParameter("start", start);
+            query.setParameter("end", end);
+            return query.getResultList();
+        } catch (PersistenceException ex) {
+            throw databaseError("Could not load the clock records of the day.", ex);
         } finally {
             closeEntityManager(em);
         }

@@ -15,6 +15,7 @@ import com.mycompany.cpoint.model.RecordType;
 import com.mycompany.cpoint.model.TimeRecord;
 import com.mycompany.cpoint.model.User;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -43,6 +44,16 @@ public class TimeRecordController {
         TimeRecord record = new TimeRecord(user, now, type);
         timeRecordDAO.insert(record);
         return record;
+    }
+
+    public List<TimeRecord> listPunches(User user) throws DatabaseException {
+        return timeRecordDAO.findByUser(user.getId());
+    }
+
+    public List<TimeRecord> listTodayPunches(User user) throws DatabaseException {
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime startOfNextDay = startOfDay.plusDays(1);
+        return timeRecordDAO.findByUserInPeriod(user.getId(), startOfDay, startOfNextDay);
     }
 
     private void checkMinimumInterval(TimeRecord last, LocalDateTime now) throws ValidationException {

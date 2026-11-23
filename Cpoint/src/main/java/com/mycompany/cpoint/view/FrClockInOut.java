@@ -32,6 +32,7 @@ public class FrClockInOut extends javax.swing.JFrame {
 
     private JFrame viewTasksScreen;
     private JFrame viewProjectsScreen;
+    private FrDailyPoint dailyPointScreen;
     private Timer clockTimer;
 
     public FrClockInOut() {
@@ -86,7 +87,7 @@ public class FrClockInOut extends javax.swing.JFrame {
     }
 
     private void closeOpenScreens() {
-        JFrame[] screens = {viewTasksScreen, viewProjectsScreen};
+        JFrame[] screens = {viewTasksScreen, viewProjectsScreen, dailyPointScreen};
 
         for (int i = 0; i < screens.length; i++) {
             if (screens[i] != null) {
@@ -115,6 +116,7 @@ public class FrClockInOut extends javax.swing.JFrame {
         btnSignOut = new javax.swing.JButton();
         btnViewTasks = new javax.swing.JButton();
         btnViewProjects = new javax.swing.JButton();
+        btnMyPunches = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -162,6 +164,13 @@ public class FrClockInOut extends javax.swing.JFrame {
             }
         });
 
+        btnMyPunches.setText("My Punches");
+        btnMyPunches.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMyPunchesActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlClockInOutLayout = new javax.swing.GroupLayout(pnlClockInOut);
         pnlClockInOut.setLayout(pnlClockInOutLayout);
         pnlClockInOutLayout.setHorizontalGroup(
@@ -171,7 +180,7 @@ public class FrClockInOut extends javax.swing.JFrame {
                 .addComponent(lblDate)
                 .addGap(128, 128, 128))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlClockInOutLayout.createSequentialGroup()
-                .addContainerGap(110, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lblHour)
                 .addGap(108, 108, 108))
             .addGroup(pnlClockInOutLayout.createSequentialGroup()
@@ -187,7 +196,8 @@ public class FrClockInOut extends javax.swing.JFrame {
                                 .addGroup(pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lblNameUser)
                                     .addComponent(lblDepartamentUser))
-                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 103, Short.MAX_VALUE)
+                                .addComponent(btnMyPunches)))
                         .addContainerGap())
                     .addGroup(pnlClockInOutLayout.createSequentialGroup()
                         .addGroup(pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -202,13 +212,14 @@ public class FrClockInOut extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(lblTittleClockInOut)
                 .addGap(18, 18, 18)
-                .addGroup(pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pnlClockInOutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnMyPunches, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(pnlClockInOutLayout.createSequentialGroup()
                         .addComponent(lblNameUser)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblDepartamentUser))
                     .addComponent(lblIconUser))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 121, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 221, Short.MAX_VALUE)
                 .addComponent(lblDate)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblHour)
@@ -286,6 +297,10 @@ public class FrClockInOut extends javax.swing.JFrame {
             return;
         }
 
+        if (!isClosed(dailyPointScreen)) {
+            dailyPointScreen.refreshData();
+        }
+
         LocalDateTime recordedAt = record.getRecordedAt();
         JOptionPane.showMessageDialog(this,
                 record.getType() + " recorded successfully.\n"
@@ -294,8 +309,17 @@ public class FrClockInOut extends javax.swing.JFrame {
                 "Punch recorded", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnClockInOutActionPerformed
 
+    private void btnMyPunchesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMyPunchesActionPerformed
+        if (isClosed(dailyPointScreen)) {
+            dailyPointScreen = new FrDailyPoint();
+            dailyPointScreen.setLocationRelativeTo(this);
+        }
+        showScreen(dailyPointScreen);// TODO add your handling code here:
+    }//GEN-LAST:event_btnMyPunchesActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClockInOut;
+    private javax.swing.JButton btnMyPunches;
     private javax.swing.JButton btnSignOut;
     private javax.swing.JButton btnViewProjects;
     private javax.swing.JButton btnViewTasks;

@@ -8,13 +8,78 @@ package com.mycompany.cpoint.view;
  *
  * @author Rangel
  */
+import com.mycompany.cpoint.controller.TimeRecordController;
+import com.mycompany.cpoint.exception.DatabaseException;
+import com.mycompany.cpoint.model.TimeRecord;
+import com.mycompany.cpoint.model.User;
+import com.mycompany.cpoint.util.UserSession;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Locale;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 public class FrDailyPoint extends javax.swing.JFrame {
 
-    /**
-     * Creates new form FrDailyPoint
-     */
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter DAY_FORMAT = DateTimeFormatter.ofPattern("EEEE", Locale.ENGLISH);
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final String EMPTY_SLOT = "--:--:--";
+
+    private final TimeRecordController timeRecordController = new TimeRecordController();
+
     public FrDailyPoint() {
         initComponents();
+        refreshData();
+    }
+
+    public void refreshData() {
+        User user = UserSession.getCurrentUser();
+
+        List<TimeRecord> todayPunches;
+        List<TimeRecord> allPunches;
+        try {
+            todayPunches = timeRecordController.listTodayPunches(user);
+            allPunches = timeRecordController.listPunches(user);
+        } catch (DatabaseException ex) {
+            JOptionPane.showMessageDialog(this, "Error loading the punches: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        showTodayPunches(todayPunches);
+        showHistory(allPunches);
+    }
+
+    private void showTodayPunches(List<TimeRecord> todayPunches) {
+        JLabel[] slots = {lblHourEntryOne, lblHourOutOne, lblHourEntryTwo, lblHourOutTwo};
+
+        for (int i = 0; i < slots.length; i++) {
+            if (i < todayPunches.size()) {
+                LocalDateTime recordedAt = todayPunches.get(i).getRecordedAt();
+                slots[i].setText(recordedAt.format(TIME_FORMAT));
+            } else {
+                slots[i].setText(EMPTY_SLOT);
+            }
+        }
+    }
+
+    private void showHistory(List<TimeRecord> allPunches) {
+        DefaultTableModel model = (DefaultTableModel) tblHistory.getModel();
+        model.setRowCount(0);
+
+        for (int i = 0; i < allPunches.size(); i++) {
+            TimeRecord punch = allPunches.get(i);
+            LocalDateTime recordedAt = punch.getRecordedAt();
+            model.addRow(new Object[]{
+                recordedAt.format(DATE_FORMAT),
+                recordedAt.format(DAY_FORMAT),
+                recordedAt.format(TIME_FORMAT),
+                punch.getType()
+            });
+        }
     }
 
     /**
@@ -40,8 +105,11 @@ public class FrDailyPoint extends javax.swing.JFrame {
         lblIconClock3 = new javax.swing.JLabel();
         lblOutTwo = new javax.swing.JLabel();
         lblHourOutTwo = new javax.swing.JLabel();
+        lblHistory = new javax.swing.JLabel();
+        scrHistory = new javax.swing.JScrollPane();
+        tblHistory = new javax.swing.JTable();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         lblTittleDailyPoint.setFont(new java.awt.Font("Arial Narrow", 1, 36)); // NOI18N
         lblTittleDailyPoint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -52,25 +120,28 @@ public class FrDailyPoint extends javax.swing.JFrame {
 
         lblEntryOne.setText("Entry One:");
 
-        lblHourEntryOne.setText("10:20");
+        lblHourEntryOne.setText("00:00:00");
 
         lblIconClock1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/cpoint/resources/relogio-nove.png"))); // NOI18N
 
         lblOutOne.setText("Out One:");
 
-        lblHourOutOne.setText("12:50");
+        lblHourOutOne.setText("00:00:00");
 
         lblIconClock2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/cpoint/resources/relogio-nove.png"))); // NOI18N
 
         lblEntryTwo.setText("Entry Two:");
 
-        lblHourEntryTwo.setText("14:20");
+        lblHourEntryTwo.setText("00:00:00");
 
         lblIconClock3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/cpoint/resources/relogio-nove.png"))); // NOI18N
 
         lblOutTwo.setText("Out Two:");
 
-        lblHourOutTwo.setText("17:00");
+        lblHourOutTwo.setText("00:00:00");
+
+        lblHistory.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
+        lblHistory.setText("History");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -79,31 +150,33 @@ public class FrDailyPoint extends javax.swing.JFrame {
             .addComponent(lblTittleDailyPoint, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(lblIconClock2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblEntryTwo)
-                        .addGap(18, 18, 18)
-                        .addComponent(lblHourEntryTwo))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(lblIconClock3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblOutTwo)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblHourOutTwo))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(lblIconClock1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblOutOne)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblHourOutOne))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(lblIconClock)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblEntryOne)
-                        .addGap(18, 18, 18)
-                        .addComponent(lblHourEntryOne)))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(lblIconClock2)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(lblEntryTwo)
+                            .addGap(18, 18, 18)
+                            .addComponent(lblHourEntryTwo))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(lblIconClock3)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(lblOutTwo)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblHourOutTwo))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(lblIconClock1)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(lblOutOne)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblHourOutOne))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(lblIconClock)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(lblEntryOne)
+                            .addGap(18, 18, 18)
+                            .addComponent(lblHourEntryOne)))
+                    .addComponent(lblHistory))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -111,7 +184,9 @@ public class FrDailyPoint extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lblTittleDailyPoint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(37, 37, 37)
+                .addGap(44, 44, 44)
+                .addComponent(lblHistory)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(lblIconClock)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -135,8 +210,21 @@ public class FrDailyPoint extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(lblOutTwo)
                         .addComponent(lblHourOutTwo)))
-                .addGap(57, 57, 57))
+                .addGap(16, 16, 16))
         );
+
+        tblHistory.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        scrHistory.setViewportView(tblHistory);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -144,7 +232,9 @@ public class FrDailyPoint extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(scrHistory, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -152,7 +242,9 @@ public class FrDailyPoint extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(105, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(scrHistory, javax.swing.GroupLayout.PREFERRED_SIZE, 402, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -162,11 +254,11 @@ public class FrDailyPoint extends javax.swing.JFrame {
      * @param args the command line arguments
      */
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblEntryOne;
     private javax.swing.JLabel lblEntryTwo;
+    private javax.swing.JLabel lblHistory;
     private javax.swing.JLabel lblHourEntryOne;
     private javax.swing.JLabel lblHourEntryTwo;
     private javax.swing.JLabel lblHourOutOne;
@@ -178,5 +270,7 @@ public class FrDailyPoint extends javax.swing.JFrame {
     private javax.swing.JLabel lblOutOne;
     private javax.swing.JLabel lblOutTwo;
     private javax.swing.JLabel lblTittleDailyPoint;
+    private javax.swing.JScrollPane scrHistory;
+    private javax.swing.JTable tblHistory;
     // End of variables declaration//GEN-END:variables
 }
