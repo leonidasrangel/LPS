@@ -95,6 +95,9 @@ public class UserController {
         if (userDAO.isProjectMember(id)) {
             errors.add("- They participate in a project. Remove them from the project first.");
         }
+        if (userDAO.hasTimeRecords(id)) {
+            errors.add("- They have clock records, which must be kept and cannot be deleted.");
+        }
 
         if (!errors.isEmpty()) {
             errors.add(0, "This user cannot be deleted:");

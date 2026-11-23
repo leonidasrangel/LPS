@@ -10,33 +10,52 @@ package com.mycompany.cpoint.controller;
  */
 import com.mycompany.cpoint.dao.TimeRecordDAO;
 import com.mycompany.cpoint.exception.DatabaseException;
+import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.RecordType;
 import com.mycompany.cpoint.model.TimeRecord;
 import com.mycompany.cpoint.model.User;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class TimeRecordController {
 
+    private static final int MIN_SECONDS_BETWEEN_PUNCHES = 60;
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
+
     private final TimeRecordDAO timeRecordDAO = new TimeRecordDAO();
 
-    public TimeRecord registerPunch(User user) throws DatabaseException {
+    public TimeRecord registerPunch(User user) throws ValidationException, DatabaseException {
         LocalDateTime now = LocalDateTime.now().withNano(0);
-        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
-        LocalDateTime startOfNextDay = startOfDay.plusDays(1);
+        TimeRecord last = timeRecordDAO.findLastByUser(user.getId());
 
-        TimeRecord lastToday = timeRecordDAO.findLastInPeriod(user.getId(), startOfDay, startOfNextDay);
+        checkMinimumInterval(last, now);
 
-        RecordType type;
-        if (lastToday == null) {
-            type = RecordType.CLOCK_IN;
-        } else if (lastToday.getType() == RecordType.CLOCK_IN) {
-            type = RecordType.CLOCK_OUT;
-        } else {
-            type = RecordType.CLOCK_IN;
+        RecordType type = RecordType.CLOCK_IN;
+        if (last != null) {
+            boolean sameDay = last.getRecordedAt().toLocalDate().equals(now.toLocalDate());
+            if (sameDay && last.getType() == RecordType.CLOCK_IN) {
+                type = RecordType.CLOCK_OUT;
+            }
         }
 
         TimeRecord record = new TimeRecord(user, now, type);
         timeRecordDAO.insert(record);
         return record;
+    }
+
+    private void checkMinimumInterval(TimeRecord last, LocalDateTime now) throws ValidationException {
+        if (last == null) {
+            return;
+        }
+
+        long seconds = Duration.between(last.getRecordedAt(), now).getSeconds();
+        if (seconds < MIN_SECONDS_BETWEEN_PUNCHES) {
+            throw new ValidationException(List.of(
+                    "Your last punch (" + last.getType() + ") was at "
+                    + last.getRecordedAt().format(TIME_FORMAT) + ".",
+                    "Wait at least " + MIN_SECONDS_BETWEEN_PUNCHES + " seconds between punches."));
+        }
     }
 }

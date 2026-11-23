@@ -15,14 +15,12 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class TimeRecordDAO extends BaseDAO {
 
-    private static final String FIND_LAST_IN_PERIOD_JPQL
-            = "SELECT r FROM TimeRecord r "
-            + "WHERE r.user.id = :userId AND r.recordedAt >= :start AND r.recordedAt < :end "
+    private static final String FIND_LAST_BY_USER_JPQL
+            = "SELECT r FROM TimeRecord r WHERE r.user.id = :userId "
             + "ORDER BY r.recordedAt DESC, r.id DESC";
 
     public void insert(TimeRecord record) throws DatabaseException {
@@ -42,15 +40,12 @@ public class TimeRecordDAO extends BaseDAO {
         }
     }
 
-    public TimeRecord findLastInPeriod(int userId, LocalDateTime start, LocalDateTime end)
-            throws DatabaseException {
+    public TimeRecord findLastByUser(int userId) throws DatabaseException {
         EntityManager em = null;
         try {
             em = JPAUtil.getEntityManager();
-            TypedQuery<TimeRecord> query = em.createQuery(FIND_LAST_IN_PERIOD_JPQL, TimeRecord.class);
+            TypedQuery<TimeRecord> query = em.createQuery(FIND_LAST_BY_USER_JPQL, TimeRecord.class);
             query.setParameter("userId", userId);
-            query.setParameter("start", start);
-            query.setParameter("end", end);
             query.setMaxResults(1);
             List<TimeRecord> found = query.getResultList();
 

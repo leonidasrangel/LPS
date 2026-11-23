@@ -7,6 +7,7 @@ package com.mycompany.cpoint.view;
 import com.mycompany.cpoint.controller.AuthController;
 import com.mycompany.cpoint.controller.TimeRecordController;
 import com.mycompany.cpoint.exception.DatabaseException;
+import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.TimeRecord;
 import com.mycompany.cpoint.model.User;
 import com.mycompany.cpoint.util.UserSession;
@@ -275,6 +276,10 @@ public class FrClockInOut extends javax.swing.JFrame {
         TimeRecord record;
         try {
             record = timeRecordController.registerPunch(UserSession.getCurrentUser());
+        } catch (ValidationException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Punch not recorded", JOptionPane.WARNING_MESSAGE);
+            return;
         } catch (DatabaseException ex) {
             JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -286,7 +291,7 @@ public class FrClockInOut extends javax.swing.JFrame {
                 record.getType() + " recorded successfully.\n"
                 + "Date: " + recordedAt.format(DATE_FORMAT) + "\n"
                 + "Time: " + recordedAt.format(TIME_FORMAT),
-                "Punch recorded", JOptionPane.INFORMATION_MESSAGE);// TODO add your handling code here:
+                "Punch recorded", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnClockInOutActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -37,6 +37,8 @@ public class UserDAO extends BaseDAO {
             = "SELECT COUNT(t) FROM Task t JOIN t.members m WHERE m.id = :userId";
     private static final String PROJECT_MEMBER_COUNT_JPQL
             = "SELECT COUNT(p) FROM Project p JOIN p.members m WHERE m.id = :userId";
+    private static final String TIME_RECORD_COUNT_JPQL
+            = "SELECT COUNT(r) FROM TimeRecord r WHERE r.user.id = :userId";
 
     public void insert(User user) throws DatabaseException {
         EntityManager em = null;
@@ -153,6 +155,11 @@ public class UserDAO extends BaseDAO {
 
     public boolean isProjectMember(int userId) throws DatabaseException {
         long total = countByUser(PROJECT_MEMBER_COUNT_JPQL, userId, "Could not check the user's projects.");
+        return total > 0;
+    }
+
+    public boolean hasTimeRecords(int userId) throws DatabaseException {
+        long total = countByUser(TIME_RECORD_COUNT_JPQL, userId, "Could not check the user's clock records.");
         return total > 0;
     }
 
