@@ -21,6 +21,8 @@ public class TeamDAO extends BaseDAO {
 
     private static final String FIND_ALL_JPQL
             = "SELECT t FROM Team t LEFT JOIN FETCH t.members ORDER BY t.id";
+    private static final String COUNT_JPQL
+            = "SELECT COUNT(t) FROM Team t";
 
     public void insert(Team team) throws DatabaseException {
         EntityManager em = null;
@@ -47,6 +49,19 @@ public class TeamDAO extends BaseDAO {
             return query.getResultList();
         } catch (PersistenceException ex) {
             throw databaseError("Could not load the teams.", ex);
+        } finally {
+            closeEntityManager(em);
+        }
+    }
+
+    public long count() throws DatabaseException {
+        EntityManager em = null;
+        try {
+            em = JPAUtil.getEntityManager();
+            TypedQuery<Long> query = em.createQuery(COUNT_JPQL, Long.class);
+            return query.getSingleResult();
+        } catch (PersistenceException ex) {
+            throw databaseError("Could not count the teams.", ex);
         } finally {
             closeEntityManager(em);
         }

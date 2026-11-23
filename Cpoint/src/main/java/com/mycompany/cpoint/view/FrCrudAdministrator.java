@@ -5,12 +5,19 @@
 package com.mycompany.cpoint.view;
 
 import com.mycompany.cpoint.controller.AuthController;
+import com.mycompany.cpoint.controller.DashboardController;
+import com.mycompany.cpoint.exception.DatabaseException;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class FrCrudAdministrator extends javax.swing.JFrame {
 
+    private static final String UNAVAILABLE = "-";
+
     private final AuthController authController = new AuthController();
+    private final DashboardController dashboardController = new DashboardController();
 
     private JFrame userScreen;
     private JFrame taskScreen;
@@ -18,10 +25,41 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
     private JFrame teamScreen;
     private JFrame viewTasksScreen;
     private JFrame viewProjectsScreen;
+    private JFrame clockScreen;
 
     public FrCrudAdministrator() {
         initComponents();
         setLocationRelativeTo(null);
+        refreshDashboardQuietly();
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowActivated(WindowEvent evt) {
+                refreshDashboardQuietly();
+            }
+        });
+    }
+
+    private void refreshDashboard() throws DatabaseException {
+        lblNumberUsers.setText(String.valueOf(dashboardController.countUsers()));
+        lblNumberTeam.setText(String.valueOf(dashboardController.countTeams()));
+        lblNumberProjects.setText(String.valueOf(dashboardController.countProjects()));
+        lblNumberTasks.setText(String.valueOf(dashboardController.countTasks()));
+    }
+
+    private void refreshDashboardQuietly() {
+        try {
+            refreshDashboard();
+        } catch (DatabaseException ex) {
+            showDashboardUnavailable();
+        }
+    }
+
+    private void showDashboardUnavailable() {
+        lblNumberUsers.setText(UNAVAILABLE);
+        lblNumberTeam.setText(UNAVAILABLE);
+        lblNumberProjects.setText(UNAVAILABLE);
+        lblNumberTasks.setText(UNAVAILABLE);
     }
 
     private boolean isClosed(JFrame screen) {
@@ -38,7 +76,7 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
 
     private void closeOpenScreens() {
         JFrame[] screens = {userScreen, taskScreen, projectScreen, teamScreen,
-            viewTasksScreen, viewProjectsScreen};
+            viewTasksScreen, viewProjectsScreen, clockScreen};
 
         for (int i = 0; i < screens.length; i++) {
             if (screens[i] != null) {
@@ -84,6 +122,7 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         btnViewProjects = new javax.swing.JButton();
         btnViewTasks = new javax.swing.JButton();
         btnSignOut = new javax.swing.JButton();
+        btnClockInOut = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -288,6 +327,11 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         lblIcon.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         btnDashboard.setText("Dashboard");
+        btnDashboard.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDashboardActionPerformed(evt);
+            }
+        });
 
         btnRegisterUser.setText("Register User");
         btnRegisterUser.addActionListener(new java.awt.event.ActionListener() {
@@ -338,6 +382,13 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
             }
         });
 
+        btnClockInOut.setText("Clock In/Out");
+        btnClockInOut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClockInOutActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlPanelCrudLayout = new javax.swing.GroupLayout(pnlPanelCrud);
         pnlPanelCrud.setLayout(pnlPanelCrudLayout);
         pnlPanelCrudLayout.setHorizontalGroup(
@@ -347,15 +398,17 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
                 .addGroup(pnlPanelCrudLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnViewTasks, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(pnlPanelCrudLayout.createSequentialGroup()
-                        .addGroup(pnlPanelCrudLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lblIcon)
-                            .addComponent(btnRegisterProject, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnRegisterUser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnRegisterTask, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnRegisterTeam, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnDashboard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnViewProjects, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnSignOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(pnlPanelCrudLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pnlPanelCrudLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(lblIcon)
+                                .addComponent(btnRegisterProject, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnRegisterUser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnRegisterTask, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnRegisterTeam, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnDashboard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnViewProjects, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnSignOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(btnClockInOut, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -379,8 +432,10 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(btnViewProjects)
                 .addGap(18, 18, 18)
+                .addComponent(btnClockInOut)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
                 .addComponent(btnSignOut)
-                .addContainerGap(57, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout pnlMainPanelLayout = new javax.swing.GroupLayout(pnlMainPanel);
@@ -487,7 +542,26 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnViewProjectsActionPerformed
 
+    private void btnDashboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDashboardActionPerformed
+        try {
+            refreshDashboard();
+        } catch (DatabaseException ex) {
+            showDashboardUnavailable();
+            JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }// TODO add your handling code here:
+    }//GEN-LAST:event_btnDashboardActionPerformed
+
+    private void btnClockInOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClockInOutActionPerformed
+        if (isClosed(clockScreen)) {
+            clockScreen = new FrClockInOut(true);
+            clockScreen.setLocationRelativeTo(this);
+        }
+        showScreen(clockScreen);// TODO add your handling code here:
+    }//GEN-LAST:event_btnClockInOutActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnClockInOut;
     private javax.swing.JButton btnDashboard;
     private javax.swing.JButton btnRegisterProject;
     private javax.swing.JButton btnRegisterTask;

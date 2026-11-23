@@ -19,6 +19,7 @@ import java.util.Locale;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
+import javax.swing.WindowConstants;
 
 public class FrClockInOut extends javax.swing.JFrame {
 
@@ -36,9 +37,17 @@ public class FrClockInOut extends javax.swing.JFrame {
     private Timer clockTimer;
 
     public FrClockInOut() {
+        this(false);
+    }
+
+    public FrClockInOut(boolean openedFromPanel) {
         initComponents();
         showCurrentUser();
         startClock();
+        if (openedFromPanel) {
+            setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            btnSignOut.setVisible(false);
+        }
         setLocationRelativeTo(null);
     }
 
@@ -71,6 +80,7 @@ public class FrClockInOut extends javax.swing.JFrame {
         if (clockTimer != null) {
             clockTimer.stop();
         }
+        closeOpenScreens();
         super.dispose();
     }
 
@@ -262,7 +272,6 @@ public class FrClockInOut extends javax.swing.JFrame {
         }
 
         authController.logout();
-        closeOpenScreens();
         new FrLogin().setVisible(true);
         dispose();
     }//GEN-LAST:event_btnSignOutActionPerformed
