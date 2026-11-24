@@ -7,14 +7,20 @@ package com.mycompany.cpoint.view;
 import com.mycompany.cpoint.controller.AuthController;
 import com.mycompany.cpoint.controller.DashboardController;
 import com.mycompany.cpoint.exception.DatabaseException;
+import com.mycompany.cpoint.model.TimeRecord;
+import com.mycompany.cpoint.model.User;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 public class FrCrudAdministrator extends javax.swing.JFrame {
 
     private static final String UNAVAILABLE = "-";
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     private final AuthController authController = new AuthController();
     private final DashboardController dashboardController = new DashboardController();
@@ -45,6 +51,26 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         lblNumberTeam.setText(String.valueOf(dashboardController.countTeams()));
         lblNumberProjects.setText(String.valueOf(dashboardController.countProjects()));
         lblNumberTasks.setText(String.valueOf(dashboardController.countTasks()));
+
+        List<TimeRecord> todayPunches = dashboardController.listTodayPunches();
+        int workingNow = dashboardController.countWorkingNow(todayPunches);
+        lblNumberWorkingNow.setText(String.valueOf(workingNow));
+        showTodayPunches(todayPunches);
+    }
+
+    private void showTodayPunches(List<TimeRecord> todayPunches) {
+        DefaultTableModel model = (DefaultTableModel) tblTodayPunches.getModel();
+        model.setRowCount(0);
+
+        for (int i = 0; i < todayPunches.size(); i++) {
+            TimeRecord punch = todayPunches.get(i);
+            User user = punch.getUser();
+            model.addRow(new Object[]{
+                user.getFirstName() + " " + user.getLastName(),
+                punch.getRecordedAt().format(TIME_FORMAT),
+                punch.getType()
+            });
+        }
     }
 
     private void refreshDashboardQuietly() {
@@ -60,6 +86,10 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         lblNumberTeam.setText(UNAVAILABLE);
         lblNumberProjects.setText(UNAVAILABLE);
         lblNumberTasks.setText(UNAVAILABLE);
+        lblNumberWorkingNow.setText(UNAVAILABLE);
+
+        DefaultTableModel model = (DefaultTableModel) tblTodayPunches.getModel();
+        model.setRowCount(0);
     }
 
     private boolean isClosed(JFrame screen) {
@@ -98,20 +128,29 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         lblTitlePanelAdm = new javax.swing.JLabel();
         lblIconUser = new javax.swing.JLabel();
-        txtSearch = new javax.swing.JTextField();
-        lblSearch = new javax.swing.JLabel();
         pnlUsers = new javax.swing.JPanel();
         lblIconUsers = new javax.swing.JLabel();
         lblNumberUsers = new javax.swing.JLabel();
+        lblCaptionUsers = new javax.swing.JLabel();
         pnlTasks = new javax.swing.JPanel();
         lblIconTask = new javax.swing.JLabel();
         lblNumberTasks = new javax.swing.JLabel();
+        lblCaptionTasks = new javax.swing.JLabel();
         pnlProjects = new javax.swing.JPanel();
         lblIconProjects = new javax.swing.JLabel();
         lblNumberProjects = new javax.swing.JLabel();
+        lblCaptionProjects = new javax.swing.JLabel();
         pnlUsersGroup = new javax.swing.JPanel();
         lblIconUsersGroup = new javax.swing.JLabel();
         lblNumberTeam = new javax.swing.JLabel();
+        lblCaptionTeams = new javax.swing.JLabel();
+        pnlWorkingNow = new javax.swing.JPanel();
+        lblIconWorkingNow = new javax.swing.JLabel();
+        lblNumberWorkingNow = new javax.swing.JLabel();
+        lblCaptionWorkingNow = new javax.swing.JLabel();
+        lblTodayPunches = new javax.swing.JLabel();
+        scrTodayPunches = new javax.swing.JScrollPane();
+        tblTodayPunches = new javax.swing.JTable();
         pnlPanelCrud = new javax.swing.JPanel();
         lblIcon = new javax.swing.JLabel();
         btnDashboard = new javax.swing.JButton();
@@ -136,10 +175,6 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         lblIconUser.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/cpoint/resources/usuario-do-circulo (3).png"))); // NOI18N
         lblIconUser.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        txtSearch.setForeground(new java.awt.Color(102, 102, 102));
-
-        lblSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/cpoint/resources/procurar.png"))); // NOI18N
-
         pnlUsers.setBackground(new java.awt.Color(204, 204, 204));
         pnlUsers.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
@@ -149,25 +184,33 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         lblNumberUsers.setForeground(new java.awt.Color(0, 0, 0));
         lblNumberUsers.setText("28");
 
+        lblCaptionUsers.setForeground(new java.awt.Color(51, 51, 51));
+        lblCaptionUsers.setText("Users");
+
         javax.swing.GroupLayout pnlUsersLayout = new javax.swing.GroupLayout(pnlUsers);
         pnlUsers.setLayout(pnlUsersLayout);
         pnlUsersLayout.setHorizontalGroup(
             pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlUsersLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblNumberUsers)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
+                .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblNumberUsers)
+                    .addComponent(lblCaptionUsers))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
                 .addComponent(lblIconUsers))
         );
         pnlUsersLayout.setVerticalGroup(
             pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlUsersLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblIconUsers)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlUsersLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblNumberUsers)
+                .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlUsersLayout.createSequentialGroup()
+                        .addComponent(lblCaptionUsers)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblNumberUsers))
+                    .addGroup(pnlUsersLayout.createSequentialGroup()
+                        .addComponent(lblIconUsers)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -182,24 +225,32 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         lblNumberTasks.setForeground(new java.awt.Color(0, 0, 0));
         lblNumberTasks.setText("100");
 
+        lblCaptionTasks.setForeground(new java.awt.Color(51, 51, 51));
+        lblCaptionTasks.setText("Tasks");
+
         javax.swing.GroupLayout pnlTasksLayout = new javax.swing.GroupLayout(pnlTasks);
         pnlTasks.setLayout(pnlTasksLayout);
         pnlTasksLayout.setHorizontalGroup(
             pnlTasksLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTasksLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblIconTask)
-                .addContainerGap())
             .addGroup(pnlTasksLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblNumberTasks)
-                .addContainerGap(64, Short.MAX_VALUE))
+                .addGroup(pnlTasksLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTasksLayout.createSequentialGroup()
+                        .addComponent(lblCaptionTasks)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblIconTask))
+                    .addGroup(pnlTasksLayout.createSequentialGroup()
+                        .addComponent(lblNumberTasks)
+                        .addGap(0, 58, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         pnlTasksLayout.setVerticalGroup(
             pnlTasksLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlTasksLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblIconTask)
+                .addGroup(pnlTasksLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblIconTask)
+                    .addComponent(lblCaptionTasks))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lblNumberTasks)
                 .addContainerGap())
@@ -216,24 +267,32 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         lblNumberProjects.setForeground(new java.awt.Color(0, 0, 0));
         lblNumberProjects.setText("36");
 
+        lblCaptionProjects.setForeground(new java.awt.Color(51, 51, 51));
+        lblCaptionProjects.setText("Projects");
+
         javax.swing.GroupLayout pnlProjectsLayout = new javax.swing.GroupLayout(pnlProjects);
         pnlProjects.setLayout(pnlProjectsLayout);
         pnlProjectsLayout.setHorizontalGroup(
             pnlProjectsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlProjectsLayout.createSequentialGroup()
-                .addContainerGap(67, Short.MAX_VALUE)
-                .addComponent(lblIconProjects)
-                .addContainerGap())
             .addGroup(pnlProjectsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblNumberProjects)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(pnlProjectsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlProjectsLayout.createSequentialGroup()
+                        .addComponent(lblCaptionProjects)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                        .addComponent(lblIconProjects))
+                    .addGroup(pnlProjectsLayout.createSequentialGroup()
+                        .addComponent(lblNumberProjects)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         pnlProjectsLayout.setVerticalGroup(
             pnlProjectsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlProjectsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblIconProjects)
+                .addGroup(pnlProjectsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblIconProjects)
+                    .addComponent(lblCaptionProjects))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lblNumberProjects)
                 .addContainerGap())
@@ -250,28 +309,99 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         lblNumberTeam.setForeground(new java.awt.Color(0, 0, 0));
         lblNumberTeam.setText("9");
 
+        lblCaptionTeams.setForeground(new java.awt.Color(51, 51, 51));
+        lblCaptionTeams.setText("Teams");
+
         javax.swing.GroupLayout pnlUsersGroupLayout = new javax.swing.GroupLayout(pnlUsersGroup);
         pnlUsersGroup.setLayout(pnlUsersGroupLayout);
         pnlUsersGroupLayout.setHorizontalGroup(
             pnlUsersGroupLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlUsersGroupLayout.createSequentialGroup()
-                .addContainerGap(65, Short.MAX_VALUE)
-                .addComponent(lblIconUsersGroup)
-                .addContainerGap())
             .addGroup(pnlUsersGroupLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblNumberTeam)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(pnlUsersGroupLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlUsersGroupLayout.createSequentialGroup()
+                        .addComponent(lblCaptionTeams)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                        .addComponent(lblIconUsersGroup))
+                    .addGroup(pnlUsersGroupLayout.createSequentialGroup()
+                        .addComponent(lblNumberTeam)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         pnlUsersGroupLayout.setVerticalGroup(
             pnlUsersGroupLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlUsersGroupLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblIconUsersGroup)
+                .addGroup(pnlUsersGroupLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblIconUsersGroup)
+                    .addComponent(lblCaptionTeams))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lblNumberTeam)
                 .addContainerGap())
         );
+
+        pnlWorkingNow.setBackground(new java.awt.Color(204, 204, 204));
+        pnlWorkingNow.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        pnlWorkingNow.setAlignmentX(1.0F);
+        pnlWorkingNow.setAlignmentY(1.0F);
+
+        lblIconWorkingNow.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/cpoint/resources/relogio-nove.png"))); // NOI18N
+
+        lblNumberWorkingNow.setFont(new java.awt.Font("Arial Black", 1, 12)); // NOI18N
+        lblNumberWorkingNow.setForeground(new java.awt.Color(0, 0, 0));
+        lblNumberWorkingNow.setText("100");
+
+        lblCaptionWorkingNow.setForeground(new java.awt.Color(51, 51, 51));
+        lblCaptionWorkingNow.setText("Working now");
+
+        javax.swing.GroupLayout pnlWorkingNowLayout = new javax.swing.GroupLayout(pnlWorkingNow);
+        pnlWorkingNow.setLayout(pnlWorkingNowLayout);
+        pnlWorkingNowLayout.setHorizontalGroup(
+            pnlWorkingNowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlWorkingNowLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlWorkingNowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlWorkingNowLayout.createSequentialGroup()
+                        .addComponent(lblCaptionWorkingNow)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblIconWorkingNow))
+                    .addGroup(pnlWorkingNowLayout.createSequentialGroup()
+                        .addComponent(lblNumberWorkingNow)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        pnlWorkingNowLayout.setVerticalGroup(
+            pnlWorkingNowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlWorkingNowLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlWorkingNowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblIconWorkingNow)
+                    .addComponent(lblCaptionWorkingNow))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblNumberWorkingNow)
+                .addContainerGap())
+        );
+
+        lblTodayPunches.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
+        lblTodayPunches.setText("Today's punches");
+
+        tblTodayPunches.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "User", "Time", "Type"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        scrTodayPunches.setViewportView(tblTodayPunches);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -280,24 +410,25 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(scrTodayPunches)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(lblTitlePanelAdm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblIconUser, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(lblSearch)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(pnlProjects, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(pnlUsersGroup, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(pnlUsers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(pnlTasks, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(pnlProjects, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(pnlUsersGroup, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(pnlUsers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(pnlTasks, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(pnlWorkingNow, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblTodayPunches))
+                        .addGap(0, 28, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -306,18 +437,19 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(lblTitlePanelAdm, javax.swing.GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE)
                     .addComponent(lblIconUser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblSearch))
-                .addGap(27, 27, 27)
+                .addGap(55, 55, 55)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pnlProjects, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(pnlUsersGroup, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(pnlTasks, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(pnlUsers, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(pnlUsers, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(pnlWorkingNow, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(18, 18, 18)
+                .addComponent(lblTodayPunches)
+                .addGap(18, 18, 18)
+                .addComponent(scrTodayPunches, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pnlPanelCrud.setBackground(new java.awt.Color(204, 204, 204));
@@ -398,18 +530,17 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
                 .addGroup(pnlPanelCrudLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnViewTasks, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(pnlPanelCrudLayout.createSequentialGroup()
-                        .addGroup(pnlPanelCrudLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pnlPanelCrudLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(lblIcon)
-                                .addComponent(btnRegisterProject, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnRegisterUser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnRegisterTask, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnRegisterTeam, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnDashboard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnViewProjects, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnSignOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(btnClockInOut, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGroup(pnlPanelCrudLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lblIcon)
+                            .addComponent(btnRegisterProject, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnRegisterUser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnRegisterTask, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnRegisterTeam, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnDashboard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnViewProjects, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnSignOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnClockInOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 1, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         pnlPanelCrudLayout.setVerticalGroup(
@@ -433,7 +564,7 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
                 .addComponent(btnViewProjects)
                 .addGap(18, 18, 18)
                 .addComponent(btnClockInOut)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
                 .addComponent(btnSignOut)
                 .addContainerGap())
         );
@@ -571,24 +702,33 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
     private javax.swing.JButton btnViewProjects;
     private javax.swing.JButton btnViewTasks;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JLabel lblCaptionProjects;
+    private javax.swing.JLabel lblCaptionTasks;
+    private javax.swing.JLabel lblCaptionTeams;
+    private javax.swing.JLabel lblCaptionUsers;
+    private javax.swing.JLabel lblCaptionWorkingNow;
     private javax.swing.JLabel lblIcon;
     private javax.swing.JLabel lblIconProjects;
     private javax.swing.JLabel lblIconTask;
     private javax.swing.JLabel lblIconUser;
     private javax.swing.JLabel lblIconUsers;
     private javax.swing.JLabel lblIconUsersGroup;
+    private javax.swing.JLabel lblIconWorkingNow;
     private javax.swing.JLabel lblNumberProjects;
     private javax.swing.JLabel lblNumberTasks;
     private javax.swing.JLabel lblNumberTeam;
     private javax.swing.JLabel lblNumberUsers;
-    private javax.swing.JLabel lblSearch;
+    private javax.swing.JLabel lblNumberWorkingNow;
     private javax.swing.JLabel lblTitlePanelAdm;
+    private javax.swing.JLabel lblTodayPunches;
     private javax.swing.JPanel pnlMainPanel;
     private javax.swing.JPanel pnlPanelCrud;
     private javax.swing.JPanel pnlProjects;
     private javax.swing.JPanel pnlTasks;
     private javax.swing.JPanel pnlUsers;
     private javax.swing.JPanel pnlUsersGroup;
-    private javax.swing.JTextField txtSearch;
+    private javax.swing.JPanel pnlWorkingNow;
+    private javax.swing.JScrollPane scrTodayPunches;
+    private javax.swing.JTable tblTodayPunches;
     // End of variables declaration//GEN-END:variables
 }
