@@ -13,6 +13,7 @@
         <class>com.mycompany.cpoint.model.User</class>
         <class>com.mycompany.cpoint.model.Team</class>
         <class>com.mycompany.cpoint.model.TimeRecord</class>
+        <class>com.mycompany.cpoint.model.UserPhoto</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 

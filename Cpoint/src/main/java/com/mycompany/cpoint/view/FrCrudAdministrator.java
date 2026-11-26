@@ -32,9 +32,11 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
     private JFrame viewTasksScreen;
     private JFrame viewProjectsScreen;
     private JFrame clockScreen;
+    private ProfileMenu profileMenu;
 
     public FrCrudAdministrator() {
         initComponents();
+        profileMenu = new ProfileMenu(this, lblIconUser);
         setLocationRelativeTo(null);
         refreshDashboardQuietly();
 

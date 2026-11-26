@@ -35,6 +35,7 @@ public class FrClockInOut extends javax.swing.JFrame {
     private JFrame viewProjectsScreen;
     private FrDailyPoint dailyPointScreen;
     private Timer clockTimer;
+    private ProfileMenu profileMenu;
 
     public FrClockInOut() {
         this(false);
@@ -43,6 +44,7 @@ public class FrClockInOut extends javax.swing.JFrame {
     public FrClockInOut(boolean openedFromPanel) {
         initComponents();
         showCurrentUser();
+        profileMenu = new ProfileMenu(this, lblIconUser);
         startClock();
         if (openedFromPanel) {
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
