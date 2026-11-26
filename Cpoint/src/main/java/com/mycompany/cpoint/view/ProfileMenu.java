@@ -60,6 +60,17 @@ public class ProfileMenu extends JPopupMenu {
         });
         add(itemRemovePhoto);
 
+        addSeparator();
+
+        JMenuItem itemChangePassword = new JMenuItem("Change password");
+        itemChangePassword.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                changePassword();
+            }
+        });
+        add(itemChangePassword);
+
         photoLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         photoLabel.setToolTipText("Profile");
         photoLabel.addMouseListener(new MouseAdapter() {
@@ -129,5 +140,10 @@ public class ProfileMenu extends JPopupMenu {
             JOptionPane.showMessageDialog(owner, "Database error: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void changePassword() {
+        ChangePasswordDialog dialog = new ChangePasswordDialog(owner);
+        dialog.setVisible(true);
     }
 }

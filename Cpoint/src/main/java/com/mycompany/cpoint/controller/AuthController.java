@@ -14,9 +14,9 @@ import com.mycompany.cpoint.exception.DatabaseException;
 import com.mycompany.cpoint.exception.ValidationException;
 import com.mycompany.cpoint.model.User;
 import com.mycompany.cpoint.util.UserSession;
+import com.mycompany.cpoint.validation.UserValidator;
 import com.mycompany.cpoint.validation.ValidationUtils;
 import java.util.ArrayList;
-
 import java.util.List;
 
 public class AuthController {
@@ -24,6 +24,7 @@ public class AuthController {
     private static final String INVALID_CREDENTIALS = "Invalid email/username or password.";
 
     private final UserDAO userDAO = new UserDAO();
+    private final UserValidator userValidator = new UserValidator();
 
     public User login(String login, String password)
             throws ValidationException, AuthenticationException, DatabaseException {
@@ -46,6 +47,27 @@ public class AuthController {
 
     public void logout() {
         UserSession.end();
+    }
+
+    public void changePassword(String currentPassword, String newPassword, String confirmation)
+            throws ValidationException, DatabaseException {
+        User sessionUser = UserSession.getCurrentUser();
+        if (sessionUser == null) {
+            throw new IllegalStateException("No user is logged in.");
+        }
+
+        userValidator.validatePasswordChange(currentPassword, newPassword, confirmation);
+
+        User storedUser = userDAO.findById(sessionUser.getId());
+        if (storedUser == null) {
+            throw new DatabaseException("Your user was not found in the database.");
+        }
+        if (!passwordMatches(currentPassword, storedUser.getPassword())) {
+            throw new ValidationException(List.of("The current password is incorrect."));
+        }
+
+        userDAO.updatePassword(storedUser.getId(), newPassword);
+        sessionUser.setPassword(newPassword);
     }
 
     private void validateInput(String login, String password) throws ValidationException {

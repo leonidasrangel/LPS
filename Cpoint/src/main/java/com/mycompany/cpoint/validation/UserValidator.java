@@ -61,6 +61,31 @@ public class UserValidator {
         }
     }
 
+    public void validatePasswordChange(String currentPassword, String newPassword,
+            String confirmation) throws ValidationException {
+        List<String> errors = new ArrayList<>();
+
+        if (ValidationUtils.isBlank(currentPassword)) {
+            errors.add("Enter your current password.");
+        }
+        if (ValidationUtils.isBlank(newPassword)) {
+            errors.add("Enter the new password.");
+        } else if (newPassword.length() < MIN_PASSWORD_LENGTH) {
+            errors.add("The new password must have at least " + MIN_PASSWORD_LENGTH + " characters.");
+        } else if (newPassword.equals(currentPassword)) {
+            errors.add("The new password must be different from the current one.");
+        }
+        if (ValidationUtils.isBlank(confirmation)) {
+            errors.add("Confirm the new password.");
+        } else if (!ValidationUtils.isBlank(newPassword) && !confirmation.equals(newPassword)) {
+            errors.add("The confirmation does not match the new password.");
+        }
+
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
+    }
+
     public void validateId(int id) throws ValidationException {
         if (id <= 0) {
             throw new ValidationException(List.of("Select a user in the table first."));

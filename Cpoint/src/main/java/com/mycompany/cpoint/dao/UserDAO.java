@@ -70,6 +70,18 @@ public class UserDAO extends BaseDAO {
         }
     }
 
+    public User findById(int id) throws DatabaseException {
+        EntityManager em = null;
+        try {
+            em = JPAUtil.getEntityManager();
+            return em.find(User.class, id);
+        } catch (PersistenceException ex) {
+            throw databaseError("Could not load the user.", ex);
+        } finally {
+            closeEntityManager(em);
+        }
+    }
+
     public User findByEmail(String email) throws DatabaseException {
         return findOne(FIND_BY_EMAIL_JPQL, email, "Could not search the user by email.");
     }
@@ -107,6 +119,27 @@ public class UserDAO extends BaseDAO {
             transaction.commit();
         } catch (PersistenceException ex) {
             throw databaseError("Could not update the user.", ex);
+        } finally {
+            closeEntityManager(em);
+        }
+    }
+
+    public void updatePassword(int id, String newPassword) throws DatabaseException {
+        EntityManager em = null;
+        try {
+            em = JPAUtil.getEntityManager();
+            EntityTransaction transaction = em.getTransaction();
+            transaction.begin();
+
+            User user = em.find(User.class, id);
+            if (user == null) {
+                throw new DatabaseException("No user found with id " + id + ".");
+            }
+            user.setPassword(newPassword);
+
+            transaction.commit();
+        } catch (PersistenceException ex) {
+            throw databaseError("Could not change the password.", ex);
         } finally {
             closeEntityManager(em);
         }
