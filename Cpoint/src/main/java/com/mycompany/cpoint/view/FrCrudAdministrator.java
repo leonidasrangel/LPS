@@ -32,6 +32,7 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
     private JFrame viewTasksScreen;
     private JFrame viewProjectsScreen;
     private JFrame clockScreen;
+    private JFrame reportsScreen;
     private ProfileMenu profileMenu;
 
     public FrCrudAdministrator() {
@@ -108,7 +109,7 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
 
     private void closeOpenScreens() {
         JFrame[] screens = {userScreen, taskScreen, projectScreen, teamScreen,
-            viewTasksScreen, viewProjectsScreen, clockScreen};
+            viewTasksScreen, viewProjectsScreen, clockScreen, reportsScreen};
 
         for (int i = 0; i < screens.length; i++) {
             if (screens[i] != null) {
@@ -164,6 +165,7 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         btnViewTasks = new javax.swing.JButton();
         btnSignOut = new javax.swing.JButton();
         btnClockInOut = new javax.swing.JButton();
+        btnReports = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -523,6 +525,13 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
             }
         });
 
+        btnReports.setText("Reports");
+        btnReports.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReportsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlPanelCrudLayout = new javax.swing.GroupLayout(pnlPanelCrud);
         pnlPanelCrud.setLayout(pnlPanelCrudLayout);
         pnlPanelCrudLayout.setHorizontalGroup(
@@ -541,7 +550,8 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
                             .addComponent(btnDashboard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnViewProjects, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnSignOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnClockInOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(btnClockInOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnReports, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(0, 1, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -566,7 +576,9 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
                 .addComponent(btnViewProjects)
                 .addGap(18, 18, 18)
                 .addComponent(btnClockInOut)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(btnReports)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
                 .addComponent(btnSignOut)
                 .addContainerGap())
         );
@@ -693,6 +705,14 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
         showScreen(clockScreen);// TODO add your handling code here:
     }//GEN-LAST:event_btnClockInOutActionPerformed
 
+    private void btnReportsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReportsActionPerformed
+        if (isClosed(reportsScreen)) {
+            reportsScreen = new FrReports();
+            reportsScreen.setLocationRelativeTo(this);
+        }
+        showScreen(reportsScreen);// TODO add your handling code here:
+    }//GEN-LAST:event_btnReportsActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClockInOut;
     private javax.swing.JButton btnDashboard;
@@ -700,6 +720,7 @@ public class FrCrudAdministrator extends javax.swing.JFrame {
     private javax.swing.JButton btnRegisterTask;
     private javax.swing.JButton btnRegisterTeam;
     private javax.swing.JButton btnRegisterUser;
+    private javax.swing.JButton btnReports;
     private javax.swing.JButton btnSignOut;
     private javax.swing.JButton btnViewProjects;
     private javax.swing.JButton btnViewTasks;

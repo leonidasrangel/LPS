@@ -32,6 +32,10 @@ public class TimeRecordDAO extends BaseDAO {
             = "SELECT r FROM TimeRecord r JOIN FETCH r.user "
             + "WHERE r.recordedAt >= :start AND r.recordedAt < :end "
             + "ORDER BY r.recordedAt DESC, r.id DESC";
+    private static final String FIND_IN_PERIOD_OLDEST_FIRST_JPQL
+            = "SELECT r FROM TimeRecord r JOIN FETCH r.user "
+            + "WHERE r.recordedAt >= :start AND r.recordedAt < :end "
+            + "ORDER BY r.recordedAt ASC, r.id ASC";
 
     public void insert(TimeRecord record) throws DatabaseException {
         EntityManager em = null;
@@ -106,6 +110,22 @@ public class TimeRecordDAO extends BaseDAO {
         try {
             em = JPAUtil.getEntityManager();
             TypedQuery<TimeRecord> query = em.createQuery(FIND_IN_PERIOD_JPQL, TimeRecord.class);
+            query.setParameter("start", start);
+            query.setParameter("end", end);
+            return query.getResultList();
+        } catch (PersistenceException ex) {
+            throw databaseError("Could not load the clock records of the period.", ex);
+        } finally {
+            closeEntityManager(em);
+        }
+    }
+
+    public List<TimeRecord> findInPeriodOldestFirst(LocalDateTime start, LocalDateTime end)
+            throws DatabaseException {
+        EntityManager em = null;
+        try {
+            em = JPAUtil.getEntityManager();
+            TypedQuery<TimeRecord> query = em.createQuery(FIND_IN_PERIOD_OLDEST_FIRST_JPQL, TimeRecord.class);
             query.setParameter("start", start);
             query.setParameter("end", end);
             return query.getResultList();
