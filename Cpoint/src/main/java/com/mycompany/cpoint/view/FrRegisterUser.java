@@ -18,6 +18,8 @@ import javax.swing.table.DefaultTableModel;
 
 public class FrRegisterUser extends javax.swing.JFrame {
 
+    private static final Integer[] WEEKLY_HOURS_OPTIONS = {44, 40, 36, 30, 20};
+
     private final UserController userController = new UserController();
     private List<User> users = new ArrayList<>();
     private User editingUser;
@@ -25,6 +27,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
     public FrRegisterUser() {
         initComponents();
         cmbRole.setModel(new DefaultComboBoxModel<>(Role.values()));
+        cmbWeeklyHours.setModel(new DefaultComboBoxModel<>(WEEKLY_HOURS_OPTIONS));
         tblUsers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         refreshTable();
         clearFields();
@@ -44,7 +47,8 @@ public class FrRegisterUser extends javax.swing.JFrame {
             return;
         }
 
-        for (User user : users) {
+        for (int i = 0; i < users.size(); i++) {
+            User user = users.get(i);
             model.addRow(new Object[]{
                 user.getId(),
                 user.getFirstName(),
@@ -53,7 +57,8 @@ public class FrRegisterUser extends javax.swing.JFrame {
                 user.getUsername(),
                 user.getDepartment(),
                 user.getGender(),
-                user.getRole()
+                user.getRole(),
+                user.getWeeklyHours()
             });
         }
     }
@@ -75,6 +80,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
         txtConfirmPassword.setText("");
         cmbDepartment.setSelectedIndex(-1);
         cmbRole.setSelectedIndex(-1);
+        cmbWeeklyHours.setSelectedItem(User.DEFAULT_WEEKLY_HOURS);
         bgGender.clearSelection();
     }
 
@@ -87,6 +93,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
         txtConfirmPassword.setEnabled(enabled);
         cmbDepartment.setEnabled(enabled);
         cmbRole.setEnabled(enabled);
+        cmbWeeklyHours.setEnabled(enabled);
         rdbMan.setEnabled(enabled);
         rdbWoman.setEnabled(enabled);
         rdbNotDisclose.setEnabled(enabled);
@@ -112,6 +119,9 @@ public class FrRegisterUser extends javax.swing.JFrame {
         cmbDepartment.setSelectedItem(user.getDepartment());
 
         cmbRole.setSelectedItem(user.getRole());
+
+        cmbWeeklyHours.setSelectedIndex(-1);
+        cmbWeeklyHours.setSelectedItem(user.getWeeklyHours());
 
         String gender = user.getGender();
         if (rdbMan.getText().equals(gender)) {
@@ -146,11 +156,23 @@ public class FrRegisterUser extends javax.swing.JFrame {
         String gender = getSelectedGender();
         Role role = (Role) cmbRole.getSelectedItem();
 
+        User user;
         if (editingUser == null) {
-            return new User(firstName, lastName, email, username, password, department, gender, role);
+            user = new User(firstName, lastName, email, username, password, department, gender, role);
+        } else {
+            user = new User(editingUser.getId(), firstName, lastName, email, username,
+                    password, department, gender, role);
         }
-        return new User(editingUser.getId(), firstName, lastName, email, username,
-                password, department, gender, role);
+        user.setWeeklyHours(getSelectedWeeklyHours());
+        return user;
+    }
+
+    private int getSelectedWeeklyHours() {
+        Integer selected = (Integer) cmbWeeklyHours.getSelectedItem();
+        if (selected == null) {
+            return 0;
+        }
+        return selected;
     }
 
     /**
@@ -185,6 +207,8 @@ public class FrRegisterUser extends javax.swing.JFrame {
         txtConfirmPassword = new javax.swing.JPasswordField();
         lblRole = new javax.swing.JLabel();
         cmbRole = new javax.swing.JComboBox<>();
+        lblWeeklyHours = new javax.swing.JLabel();
+        cmbWeeklyHours = new javax.swing.JComboBox<>();
         lblIcon = new javax.swing.JLabel();
         btnCancel = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
@@ -232,6 +256,8 @@ public class FrRegisterUser extends javax.swing.JFrame {
 
         lblRole.setText("Role:");
 
+        lblWeeklyHours.setText("Weekly hours:");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -255,15 +281,6 @@ public class FrRegisterUser extends javax.swing.JFrame {
                     .addComponent(txtUsername)
                     .addComponent(txtPassword)))
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(lblGender)
-                .addGap(69, 69, 69)
-                .addComponent(rdbMan)
-                .addGap(18, 18, 18)
-                .addComponent(rdbWoman)
-                .addGap(18, 18, 18)
-                .addComponent(rdbNotDisclose)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblConfirmPassword)
                     .addComponent(lblDepartment)
@@ -273,6 +290,19 @@ public class FrRegisterUser extends javax.swing.JFrame {
                     .addComponent(cmbRole, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(cmbDepartment, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txtConfirmPassword)))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(lblGender)
+                .addGap(69, 69, 69)
+                .addComponent(rdbMan)
+                .addGap(18, 18, 18)
+                .addComponent(rdbWoman)
+                .addGap(18, 18, 18)
+                .addComponent(rdbNotDisclose)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(lblWeeklyHours)
+                .addGap(36, 36, 36)
+                .addComponent(cmbWeeklyHours, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -315,7 +345,11 @@ public class FrRegisterUser extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblRole)
                     .addComponent(cmbRole, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(36, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblWeeklyHours)
+                    .addComponent(cmbWeeklyHours, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
 
         lblIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/cpoint/resources/logoTest.jpg"))); // NOI18N
@@ -340,14 +374,14 @@ public class FrRegisterUser extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID", "First name", "Last name", "Email", "Username", "Department", "Gender", "Role"
+                "ID", "First name", "Last name", "Email", "Username", "Department", "Gender", "Role", "Weekly hours"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
+                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                true, true, true, true, true, true, true, false
+                true, true, true, true, true, true, true, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -448,8 +482,13 @@ public class FrRegisterUser extends javax.swing.JFrame {
             refreshTable();
             clearFields();
             enableFields(false);
-            JOptionPane.showMessageDialog(this,
-                    isNew ? "User registered successfully." : "User updated successfully.");
+            String message;
+            if (isNew) {
+                message = "User registered successfully.";
+            } else {
+                message = "User updated successfully.";
+            }
+            JOptionPane.showMessageDialog(this, message);
         } catch (ValidationException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Validation error", JOptionPane.WARNING_MESSAGE);
@@ -545,6 +584,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
     private javax.swing.JButton btnSave;
     private javax.swing.JComboBox<String> cmbDepartment;
     private javax.swing.JComboBox<Role> cmbRole;
+    private javax.swing.JComboBox<Integer> cmbWeeklyHours;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblConfirmPassword;
     private javax.swing.JLabel lblDepartment;
@@ -557,6 +597,7 @@ public class FrRegisterUser extends javax.swing.JFrame {
     private javax.swing.JLabel lblRole;
     private javax.swing.JLabel lblTitle;
     private javax.swing.JLabel lblUserName;
+    private javax.swing.JLabel lblWeeklyHours;
     private javax.swing.JRadioButton rdbMan;
     private javax.swing.JRadioButton rdbNotDisclose;
     private javax.swing.JRadioButton rdbWoman;

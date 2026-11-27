@@ -19,6 +19,8 @@ public class UserValidator {
     private static final Pattern EMAIL_PATTERN
             = Pattern.compile("^[\\w.+-]+@[\\w-]+(\\.[\\w-]+)*\\.[a-zA-Z]{2,}$");
     private static final int MIN_PASSWORD_LENGTH = 6;
+    private static final int MIN_WEEKLY_HOURS = 1;
+    private static final int MAX_WEEKLY_HOURS = 44;
 
     public void validate(User user) throws ValidationException {
         if (user == null) {
@@ -54,6 +56,10 @@ public class UserValidator {
         }
         if (user.getRole() == null) {
             errors.add("Select the role.");
+        }
+        if (user.getWeeklyHours() < MIN_WEEKLY_HOURS || user.getWeeklyHours() > MAX_WEEKLY_HOURS) {
+            errors.add("Select the weekly hours (between " + MIN_WEEKLY_HOURS
+                    + " and " + MAX_WEEKLY_HOURS + ").");
         }
 
         if (!errors.isEmpty()) {

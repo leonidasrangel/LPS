@@ -16,10 +16,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "users")
 public class User {
+
+    public static final int DEFAULT_WEEKLY_HOURS = 44;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,6 +52,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @ColumnDefault("44")
+    @Column(name = "weekly_hours", nullable = false)
+    private int weeklyHours = DEFAULT_WEEKLY_HOURS;
 
     protected User() {
         // Required by JPA
@@ -138,6 +145,14 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public int getWeeklyHours() {
+        return weeklyHours;
+    }
+
+    public void setWeeklyHours(int weeklyHours) {
+        this.weeklyHours = weeklyHours;
     }
 
     @Override

@@ -128,16 +128,6 @@
                       <Component id="txtPassword" alignment="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
-              <Group type="102" attributes="0">
-                  <Component id="lblGender" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="69" max="-2" attributes="0"/>
-                  <Component id="rdbMan" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Component id="rdbWoman" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Component id="rdbNotDisclose" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-              </Group>
               <Group type="102" alignment="0" attributes="0">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="lblConfirmPassword" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -150,6 +140,21 @@
                       <Component id="cmbDepartment" max="32767" attributes="0"/>
                       <Component id="txtConfirmPassword" max="32767" attributes="0"/>
                   </Group>
+              </Group>
+              <Group type="102" attributes="0">
+                  <Component id="lblGender" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="69" max="-2" attributes="0"/>
+                  <Component id="rdbMan" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Component id="rdbWoman" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Component id="rdbNotDisclose" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+              </Group>
+              <Group type="102" attributes="0">
+                  <Component id="lblWeeklyHours" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
+                  <Component id="cmbWeeklyHours" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -203,7 +208,12 @@
                       <Component id="lblRole" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="cmbRole" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="36" max="32767" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="lblWeeklyHours" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="cmbWeeklyHours" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace pref="39" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -317,6 +327,16 @@
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Role&gt;"/>
           </AuxValues>
         </Component>
+        <Component class="javax.swing.JLabel" name="lblWeeklyHours">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Weekly hours:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="cmbWeeklyHours">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Integer&gt;"/>
+          </AuxValues>
+        </Component>
       </SubComponents>
     </Container>
     <Component class="javax.swing.JLabel" name="lblIcon">
@@ -357,7 +377,7 @@
         <Component class="javax.swing.JTable" name="tblUsers">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="8" rowCount="0">
+              <Table columnCount="9" rowCount="0">
                 <Column editable="true" title="ID" type="java.lang.Integer"/>
                 <Column editable="true" title="First name" type="java.lang.Object"/>
                 <Column editable="true" title="Last name" type="java.lang.Object"/>
@@ -366,6 +386,7 @@
                 <Column editable="true" title="Department" type="java.lang.Object"/>
                 <Column editable="true" title="Gender" type="java.lang.Object"/>
                 <Column editable="false" title="Role" type="java.lang.Object"/>
+                <Column editable="false" title="Weekly hours" type="java.lang.Integer"/>
               </Table>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
